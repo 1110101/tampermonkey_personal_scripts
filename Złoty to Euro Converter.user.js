@@ -18,16 +18,6 @@
 (async function () {
 	'use strict';
 
-	/*
-     * DEVELOPER NOTES:
-     * Version 4.0: Refined metadata and code comments for clarity.
-     * Version 3.0 Fix: Addressed an infinite loop issue caused by the MutationObserver reacting to the script's
-     * own changes. The fix has two parts:
-     *   1. A negative lookahead in the regex `(?!\s*\([^)]*€\))` prevents matching prices that have already been converted.
-     *   2. The MutationObserver is temporarily disconnected before the DOM is modified and reconnected after,
-     *      ensuring it only reacts to external page changes.
-    */
-
 
 	// First, perform a quick check to see if the currency symbol exists. If not, exit early to save resources.
 	if (!/zł|zl/i.test(document.body.textContent)) {

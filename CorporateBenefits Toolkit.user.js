@@ -1,14 +1,15 @@
 // ==UserScript==
-// @name				CorporateBenefits Toolkit
-// @namespace			1110101
-// @version				1.1.0
-// @description			Sort and filter offers on corporate benefits website by discount percentage
-// @author				1110101@oczc.de
-// @match				https://*.mitarbeiterangebote.de/overview/*
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=mitarbeiterangebote.de
-// @grant				GM_addStyle
-// @run-at				document-idle
-// @license				MIT
+// @name         CorporateBenefits Toolkit
+// @namespace    1110101
+// @version      1.1.0
+// @description  Sort and filter offers by discount, fix shop buttons to open directly
+// @author       1110101@oczc.de
+// @match        https://*.mitarbeiterangebote.de/overview/*
+// @match        https://*.mitarbeiterangebote.de/offer/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=mitarbeiterangebote.de
+// @grant        GM_addStyle
+// @run-at       document-idle
+// @license      MIT
 // ==/UserScript==
 
 (function () {
@@ -612,11 +613,98 @@
 		}, 500);
 	}
 
-	// Start the script
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', waitForContent);
-	} else {
-		waitForContent();
+	/**
+	 * Fix shop buttons on offer pages to link directly without redirect overlay
+	 */
+	function fixShopButtons() {
+		// Find all shop buttons (with shop icon) that have data-href attribute
+		// Exclude code-request buttons
+		const shopButtons = document.querySelectorAll('.cbg3-icon--shop button[data-href]:not(.cbg3-code-request)');
+		
+		shopButtons.forEach(button => {
+			const url = button.getAttribute('data-href');
+			if (!url) {return;}
+
+			// Remove the overlay-related attributes from parent
+			const parentDiv = button.closest('.cbg3-button--standard');
+			if (parentDiv) {
+				parentDiv.classList.remove('cbg3-overlay--open');
+				parentDiv.removeAttribute('data-overlay-type');
+				parentDiv.removeAttribute('data-overlay-id');
+			}
+
+			// Create a link element that looks like the original button
+			const link = document.createElement('a');
+			link.href = url;
+			link.target = '_blank';
+			link.rel = 'noopener noreferrer';
+			link.className = button.className;
+			link.innerHTML = button.innerHTML;
+
+			// Replace the button with the link
+			button.replaceWith(link);
+		});
+	}
+
+	/**
+	 * Wait for shop buttons on offer pages
+	 */
+	function waitForShopButtons() {
+		// Use MutationObserver to watch for changes
+		const observer = new MutationObserver((mutations) => {
+			let shouldReinitialize = false;
+
+			mutations.forEach((mutation) => {
+				if (mutation.type === 'childList') {
+					mutation.addedNodes.forEach((node) => {
+						if (node.nodeType === Node.ELEMENT_NODE) {
+							// Check if shop buttons were added
+							if (node.classList?.contains('cbg3-salesoption') ||
+								node.querySelector?.('.referrerShopButton')) {
+								shouldReinitialize = true;
+							}
+						}
+					});
+				}
+			});
+
+			// Reinitialize if new buttons were detected
+			if (shouldReinitialize) {
+				setTimeout(() => {
+					fixShopButtons();
+				}, 100);
+			}
+		});
+
+		// Start observing
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true
+		});
+
+		// Initial fix with a small delay to ensure DOM is ready
+		setTimeout(() => {
+			fixShopButtons();
+		}, 500);
+	}
+
+	// Start the script based on current page
+	const currentPath = window.location.pathname;
+	
+	if (currentPath.includes('/overview/')) {
+		// Overview page - sort and filter functionality
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', waitForContent);
+		} else {
+			waitForContent();
+		}
+	} else if (currentPath.includes('/offer/')) {
+		// Offer page - fix shop buttons
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', waitForShopButtons);
+		} else {
+			waitForShopButtons();
+		}
 	}
 
 })();

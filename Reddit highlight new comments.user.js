@@ -17,15 +17,15 @@
 'use strict';
 
 /*
+
+    based on https://github.com/Farow/userscripts
+
 	changelog:
 
-		2025-01-27 - 3.0.1 (Additional improvements by Claude)
-			- Fixed critical bugs in custom visit parsing and element selection.
-			- Fixed default highlighting behavior - now properly highlights comments from last visit on page load.
-			- Fixed custom time input bug - "00:59" now correctly shows "59 minutes ago" instead of "just now".
+		2025-01-27 - 3.0.1 (Vibe coded with Cursor)
 			- Added quick action buttons for common time periods (5min, 30min, 1h, ½ post age, ¼ post age).
 			- Added +/− buttons to adjust highlight time by 10min (or 1h with Shift key).
-		2025-09-01 - 3.0.0 (Upgrade by Gemini)
+		2025-09-01 - 3.0.0 (Vibe coded with Gemini)
 			- Upgraded code to modern ES6+ standards (const/let, arrow functions, template literals).
 			- Replaced inefficient DOM selections with querySelector for better performance and readability.
 			- Removed obsolete helper functions by utilizing modern JavaScript features.

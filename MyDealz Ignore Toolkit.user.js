@@ -1,20 +1,20 @@
 // ==UserScript==
-// @name				MyDealz Ignore Helper
-// @namespace			1110101
-// @version				4.4
-// @description			Ignore deals by keyword or manually, track read deals with visual markers
-// @author				1110101@oczc.de
-// @match				https://www.mydealz.de/*
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=mydealz.de
-// @grant				GM_addStyle
-// @grant				GM_getValue
-// @grant				GM_setValue
-// @grant				GM_deleteValue
-// @grant				GM_registerMenuCommand
-// @run-at				document-idle
-// @license				MIT
-// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MyDealz%20Ignore%20Toolkit.user.js
-// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MyDealz%20Ignore%20Toolkit.user.js
+// @name         MyDealz Ignore Helper
+// @namespace    1110101
+// @version      4.4
+// @description  Ignore deals by keyword or manually, track read deals with visual markers
+// @author       1110101@oczc.de
+// @match        https://www.mydealz.de/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=mydealz.de
+// @grant        GM_addStyle
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_deleteValue
+// @grant        GM_registerMenuCommand
+// @run-at       document-idle
+// @license      MIT
+// @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MyDealz%20Ignore%20Toolkit.user.js
+// @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MyDealz%20Ignore%20Toolkit.user.js
 // ==/UserScript==
 
 /*
@@ -312,13 +312,9 @@
 			if (elNode.tagName === 'ARTICLE') {
 				processNewArticle(elNode, observerObserver);
 				addTitleIgnoreButton(elNode);
-			}
-			// Handle vote boxes
-			else if (elNode.matches && elNode.matches('.vote-box')) {
+			} else if (elNode.matches && elNode.matches('.vote-box')) {
 				insertIgnoreButton(elNode);
-			}
-			// Check children for vote boxes
-			else if (elNode.querySelectorAll) {
+			} else if (elNode.querySelectorAll) {
 				elNode.querySelectorAll('.vote-box').forEach(elVoteBox => {
 					insertIgnoreButton(elVoteBox);
 				});
@@ -432,7 +428,7 @@
 				const arrKeywords = GM_getValue('ignoreKeywords', []);
 				const objKeyword = {
 					keyword: strKeyword,
-					exactMatch: elExactMatchCheckbox.checked
+					exactMatch: elExactMatchCheckbox.checked,
 				};
 
 				// Check if keyword already exists
@@ -501,7 +497,7 @@
 				const arrKeywords = GM_getValue('ignoreKeywords', []);
 				const objKeyword = {
 					keyword: strKeyword,
-					exactMatch: elExactMatchToggle.checked
+					exactMatch: elExactMatchToggle.checked,
 				};
 
 				// Check if keyword already exists

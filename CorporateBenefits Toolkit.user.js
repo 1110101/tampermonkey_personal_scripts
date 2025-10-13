@@ -31,21 +31,21 @@
 			categoryContent: '.cbg3-category--content',
 			listItem: '.cbg3-list-item',
 			discountElement: '.cbg3-list-item--discount p',
-			categoryHead: '.cbg3-category--head'
+			categoryHead: '.cbg3-category--head',
 		},
 		classes: {
 			controlsContainer: 'cb-discount-controls',
 			sortButton: 'cb-sort-btn',
 			filterButton: 'cb-filter-btn',
-			active: 'active'
-		}
+			active: 'active',
+		},
 	};
 
 	// Global state for all categories
 	const GLOBAL_STATE = {
 		sortState: 'desc', // 'desc', 'asc', 'off'
 		filterState: 'all', // 'all', 'high', 'medium', 'low'
-		filterRanges: null // Will be calculated dynamically: { high: [min, max], medium: [min, max], low: [min, max] }
+		filterRanges: null, // Will be calculated dynamically: { high: [min, max], medium: [min, max], low: [min, max] }
 	};
 
 	/**
@@ -54,7 +54,9 @@
      * @returns {number} - Numeric value for sorting (higher = better discount)
      */
 	function parseDiscountValue(discountText) {
-		if (!discountText) {return 0;}
+		if (!discountText) {
+			return 0;
+		}
 
 		// Remove "Rabatt" and clean up text
 		const text = discountText.replace(/\s*Rabatt\s*$/, '').trim();
@@ -91,7 +93,9 @@
      */
 	function getItemDiscountValue(item) {
 		const discountElement = item.querySelector(CONFIG.selectors.discountElement);
-		if (!discountElement) {return 0;}
+		if (!discountElement) {
+			return 0;
+		}
 
 		const discountText = discountElement.textContent.trim();
 		return parseDiscountValue(discountText);
@@ -104,7 +108,9 @@
      */
 	function sortItemsByDiscount(category, ascending = false) {
 		const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
-		if (!contentContainer) {return;}
+		if (!contentContainer) {
+			return;
+		}
 
 		const items = Array.from(contentContainer.querySelectorAll(CONFIG.selectors.listItem));
 
@@ -136,7 +142,9 @@
 	 */
 	function filterItemsByDiscount(category, filterType) {
 		const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
-		if (!contentContainer) {return;}
+		if (!contentContainer) {
+			return;
+		}
 
 		const items = contentContainer.querySelectorAll(CONFIG.selectors.listItem);
 		const ranges = GLOBAL_STATE.filterRanges;
@@ -254,7 +262,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false }
+			off: { icon: '—', label: 'Sortierung aus', active: false },
 		};
 
 		const updateButtonUI = () => {
@@ -377,11 +385,15 @@
 		const categories = document.querySelectorAll('.cbg3-content');
 		categories.forEach(category => {
 			const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
-			if (!contentContainer) {return;}
+			if (!contentContainer) {
+				return;
+			}
 
 			const items = contentContainer.querySelectorAll(CONFIG.selectors.listItem);
 			items.forEach(item => {
-				if (item.classList.contains('cbg3-ad')) {return;}
+				if (item.classList.contains('cbg3-ad')) {
+					return;
+				}
 				const discountValue = getItemDiscountValue(item);
 				if (discountValue > 0) {
 					allDiscounts.push(discountValue);
@@ -394,7 +406,7 @@
 			return {
 				high: [15, Infinity],
 				medium: [10, 15],
-				low: [0, 10]
+				low: [0, 10],
 			};
 		}
 
@@ -414,7 +426,7 @@
 		return {
 			low: [min, tertile1],
 			medium: [tertile1, tertile2],
-			high: [tertile2, max]
+			high: [tertile2, max],
 		};
 	}
 
@@ -464,7 +476,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false }
+			off: { icon: '—', label: 'Sortierung aus', active: false },
 		};
 		const stateInfo = states[GLOBAL_STATE.sortState];
 		const baseColor = '#007bff';
@@ -546,7 +558,9 @@
 		categoryContainers.forEach(contentContainer => {
 			// Check if this content container has items and doesn't have controls yet
 			const items = contentContainer.querySelectorAll(CONFIG.selectors.listItem);
-			if (items.length === 0) {return;}
+			if (items.length === 0) {
+				return;
+			}
 
 			// Check if controls already exist
 			if (contentContainer.previousElementSibling?.classList?.contains(CONFIG.classes.controlsContainer)) {
@@ -606,7 +620,7 @@
 		// Start observing
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
 		});
 
 		// Initial initialization with a small delay to ensure DOM is ready
@@ -622,10 +636,12 @@
 		// Find all shop buttons (with shop icon) that have data-href attribute
 		// Exclude code-request buttons
 		const shopButtons = document.querySelectorAll('.cbg3-icon--shop button[data-href]:not(.cbg3-code-request)');
-		
+
 		shopButtons.forEach(button => {
 			const url = button.getAttribute('data-href');
-			if (!url) {return;}
+			if (!url) {
+				return;
+			}
 
 			// Remove the overlay-related attributes from parent
 			const parentDiv = button.closest('.cbg3-button--standard');
@@ -681,7 +697,7 @@
 		// Start observing
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
 		});
 
 		// Initial fix with a small delay to ensure DOM is ready
@@ -692,7 +708,7 @@
 
 	// Start the script based on current page
 	const currentPath = window.location.pathname;
-	
+
 	if (currentPath.includes('/overview/')) {
 		// Overview page - sort and filter functionality
 		if (document.readyState === 'loading') {

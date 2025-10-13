@@ -1,19 +1,19 @@
 // ==UserScript==
-// @name				Reddit highlight new comments
-// @namespace			https://github.com/Farow/userscripts
-// @version				3.0.1
-// @description			Highlights new comments since your last visit
-// @author				Farow, 1110101, Claude, Gemini
-// @include				/https?:\/\/[a-z]+\.reddit\.com\/r\/[\w:+-]+\/comments\/[\da-z]/
-// @require				https://raw.githubusercontent.com/bgrins/TinyColor/master/tinycolor.js
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=reddit.com
-// @grant				GM_getValue
-// @grant				GM_setValue
-// @grant				GM_addStyle
-// @run-at				document-idle
-// @license				MIT
-// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Reddit%20highlight%20new%20comments.user.js
-// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Reddit%20highlight%20new%20comments.user.js
+// @name         Reddit highlight new comments
+// @namespace    https://github.com/Farow/userscripts
+// @version      3.0.1
+// @description  Highlights new comments since your last visit
+// @author       Farow, 1110101, Claude, Gemini
+// @match        https://*.reddit.com/r/*/comments/*
+// @require      https://raw.githubusercontent.com/bgrins/TinyColor/master/tinycolor.js
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=reddit.com
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_addStyle
+// @run-at       document-idle
+// @license      MIT
+// @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Reddit%20highlight%20new%20comments.user.js
+// @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Reddit%20highlight%20new%20comments.user.js
 // ==/UserScript==
 
 'use strict';
@@ -135,9 +135,9 @@ const HNC = {
 				comment.classList.add('hnc_new');
 
 				const elements = {
-					'comment': comment,
+					comment,
 					'text': comment.querySelector(usertextSelector),
-					'time': comment.querySelector(timestampSelector)
+					'time': comment.querySelector(timestampSelector),
 				};
 
 				const elementToStyle = elements[this.config.apply_on];
@@ -157,9 +157,9 @@ const HNC = {
 			comment.classList.remove('hnc_new');
 
 			const elements = {
-				'comment': comment,
+				comment,
 				'text': comment.querySelector('.usertext-body > .md'),
-				'time': comment.querySelector('time')
+				'time': comment.querySelector('time'),
 			};
 
 			for (const key in elements) {
@@ -211,11 +211,11 @@ const HNC = {
 		const color_final = window.tinycolor({
 			h: color_older.h + (color_newer.h - color_older.h) * time_diff,
 			s: color_older.s + (color_newer.s - color_older.s) * time_diff,
-			l: color_older.l + (color_newer.l - color_older.l) * time_diff
+			l: color_older.l + (color_newer.l - color_older.l) * time_diff,
 		});
 
 		return color_final.toHslString();
-	}
+	},
 };
 
 HNC.ui = {
@@ -409,17 +409,13 @@ HNC.ui = {
 			HNC.reset_highlighting();
 			HNC.ui.currentHighlightTime = null;
 			HNC.ui.update_time_display(null);
-		}
-		/* custom */
-		else if (event.target.value === 'custom') {
+		} else if (event.target.value === 'custom') {
 			document.getElementById('comment-visits').style.display = 'none';
 			const custom = document.getElementById('hnc_custom_visit');
 			custom.style.display = '';
 			custom.focus();
 			custom.setSelectionRange(0, 2);
-		}
-		/* previous visit */
-		else {
+		} else {
 			const visitTime = parseInt(event.target.value, 10);
 			HNC.ui.currentHighlightTime = visitTime;
 			HNC.reset_highlighting();
@@ -602,7 +598,7 @@ HNC.ui = {
 		const elements = {
 			'comment': preview,
 			'text': preview.querySelector('.usertext-body > .md'),
-			'time': preview.querySelector('.live-timestamp')
+			'time': preview.querySelector('.live-timestamp'),
 		};
 
 		for (const [, element] of Object.entries(elements)) {
@@ -626,7 +622,7 @@ HNC.ui = {
 		if (elementToStyle) {
 			elementToStyle.setAttribute('style', HNC.generate_comment_style(comment_age, double_comment_age));
 		}
-	}
+	},
 };
 
 HNC.data = {
@@ -794,7 +790,7 @@ HNC.data = {
 		JnLoeCnVTcNP1oBfVBY97OiGzKxPbfEXHe+9yp7HYNIahPIqS4Eco3IzWPR9v11tqVu2HtmsysaQs2eNgsoCWdY8LKLfwmnVzWeJfmzrysdG3ibB
 		79aAvzBbjamIxWItzOylDg2oGXVqZCIr5mSwJz2uoeZWNput19p7kPNJrjw7p67Ty+Vy8iaPAswdeZj2sJAtGArKwyPpZVIs0Sckv6d/Qmi3XHfh
 		N+4XuB5Yz6XWxkwzC76YXoxOjI/w0oarkew5ExlnFW2Mu7VNMGSPKPhKMOhH8BvOyeen8YeDp/sVzeSvMqL246FnbV32SPdpTa0q8Ly/60amOe0Z
-		Tw0AAAAASUVORK5CYII=)`
+		Tw0AAAAASUVORK5CYII=)`,
 };
 
 HNC.cfg = {
@@ -815,9 +811,9 @@ HNC.cfg = {
 			'apply_on': 'text',
 			'comment_style': 'background-color: %color !important;\npadding: 0 5px;',
 			'history': {},
-			'history_expiration': 7 // in days
+			'history_expiration': 7, // in days
 		};
-	}
+	},
 };
 
 /* original authored by TheBrain, at http://stackoverflow.com/a/12475270 - slightly modified for ES6 */
@@ -856,7 +852,7 @@ function time_ago(time, _precision = 2) {
 		[4838400, 'Last month', 'Next month'],
 		[29030400, 'months', 2419200],
 		[58060800, 'Last year', 'Next year'],
-		[2903040000, 'years', 29030400]
+		[2903040000, 'years', 29030400],
 	];
 
 	const seconds = (Date.now() - timeInput) / 1000;
@@ -885,6 +881,6 @@ function time_ago(time, _precision = 2) {
 try {
 	HNC.init();
 } catch (error) {
-	// eslint-disable-next-line no-console
+
 	console.error('[Reddit highlight new comments]', error);
 }

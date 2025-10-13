@@ -1,20 +1,20 @@
 // ==UserScript==
-// @name				Kleinanzeigen.de Toolkit
-// @namespace			1110101
-// @version				5.3
-// @description			Save all data including text and images on Kleinanzeigen.de to quickly reupload them
-// @author				1110101@oczc.de
-// @match				https://www.kleinanzeigen.de/p-anzeige-aufgeben-schritt2.html*
-// @match				https://www.kleinanzeigen.de/p-anzeige-bearbeiten.html*
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=kleinanzeigen.de
-// @grant				GM_setValue
-// @grant				GM_getValue
-// @grant				GM_deleteValue
-// @grant				GM_addStyle
-// @run-at				document-idle
-// @license				MIT
-// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Kleinanzeigen%20Toolkit.user.js
-// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Kleinanzeigen%20Toolkit.user.js
+// @name         Kleinanzeigen.de Toolkit
+// @namespace    1110101
+// @version      5.3
+// @description  Save all data including text and images on Kleinanzeigen.de to quickly reupload them
+// @author       1110101@oczc.de
+// @match        https://www.kleinanzeigen.de/p-anzeige-aufgeben-schritt2.html*
+// @match        https://www.kleinanzeigen.de/p-anzeige-bearbeiten.html*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=kleinanzeigen.de
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_deleteValue
+// @grant        GM_addStyle
+// @run-at       document-idle
+// @license      MIT
+// @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Kleinanzeigen%20Toolkit.user.js
+// @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Kleinanzeigen%20Toolkit.user.js
 // ==/UserScript==
 
 (function () {
@@ -24,7 +24,7 @@
 		TEMPLATES_KEY: 'kleinanzeigen_ad_templates',
 		IMAGE_DB_NAME: 'KleinanzeigenImageDB',
 		IMAGE_STORE_NAME: 'saved_images',
-		DB_VERSION: 2
+		DB_VERSION: 2,
 	};
 
 	const STYLES = `
@@ -61,11 +61,19 @@
 		setText: (templates) => GM_setValue(CONFIG.TEMPLATES_KEY, templates),
 		db: null,
 		async initDB() {
-			if (this.db) {return this.db;}
+			if (this.db) {
+				return this.db;
+			}
 			return new Promise((resolve, reject) => {
 				const request = indexedDB.open(CONFIG.IMAGE_DB_NAME, CONFIG.DB_VERSION);
-				request.onupgradeneeded = e => { const db = e.target.result; if (!db.objectStoreNames.contains(CONFIG.IMAGE_STORE_NAME)) { const store = db.createObjectStore(CONFIG.IMAGE_STORE_NAME, { keyPath: 'id', autoIncrement: true }); store.createIndex('group', 'group', { unique: false }); }};
-				request.onsuccess = e => { this.db = e.target.result; resolve(this.db); };
+				request.onupgradeneeded = e => {
+					const db = e.target.result; if (!db.objectStoreNames.contains(CONFIG.IMAGE_STORE_NAME)) {
+						const store = db.createObjectStore(CONFIG.IMAGE_STORE_NAME, { keyPath: 'id', autoIncrement: true }); store.createIndex('group', 'group', { unique: false });
+					}
+				};
+				request.onsuccess = e => {
+					this.db = e.target.result; resolve(this.db);
+				};
 				request.onerror = e => reject(e.target.error);
 			});
 		},
@@ -85,14 +93,18 @@
 			const request = index.openKeyCursor(IDBKeyRange.only(groupName));
 			request.onsuccess = () => {
 				const cursor = request.result;
-				if (cursor) { transaction.objectStore(CONFIG.IMAGE_STORE_NAME).delete(cursor.primaryKey); cursor.continue(); }
+				if (cursor) {
+					transaction.objectStore(CONFIG.IMAGE_STORE_NAME).delete(cursor.primaryKey); cursor.continue();
+				}
 			};
 			return new Promise(resolve => transaction.oncomplete = resolve);
-		}
+		},
 	};
 
 	const escapeHTML = (str) => {
-		if (!str) {return '';}
+		if (!str) {
+			return '';
+		}
 		return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 	};
 
@@ -104,14 +116,22 @@
 			toast.textContent = message;
 			document.body.appendChild(toast);
 			setTimeout(() => toast.style.opacity = '1', 10);
-			setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+			setTimeout(() => {
+				toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500);
+			}, 3000);
 		},
 		modal: (html) => new Promise(resolve => {
 			const overlay = document.createElement('div');
 			overlay.className = 'gm-overlay';
 			overlay.innerHTML = `<div class="gm-modal">${html}</div>`;
-			const cleanup = (value) => { overlay.remove(); resolve(value); };
-			overlay.onclick = e => { if (e.target === overlay) {cleanup(null);} };
+			const cleanup = (value) => {
+				overlay.remove(); resolve(value);
+			};
+			overlay.onclick = e => {
+				if (e.target === overlay) {
+					cleanup(null);
+				}
+			};
 			overlay.querySelector('#gm-cancel-btn')?.addEventListener('click', () => cleanup(null));
 			overlay.querySelector('#gm-confirm-btn')?.addEventListener('click', () => {
 				const input = overlay.querySelector('input');
@@ -121,13 +141,15 @@
 			overlay.querySelector('input')?.focus();
 		}),
 		prompt: (title, val = '') => UI.modal(`<h3>${title}</h3><input type="text" value="${val}"><div class="gm-modal-buttons"><button id="gm-cancel-btn">Abbrechen</button><button id="gm-confirm-btn" class="confirm">OK</button></div>`),
-		confirm: (title) => UI.modal(`<h3>${title}</h3><div class="gm-modal-buttons"><button id="gm-cancel-btn">Nein</button><button id="gm-confirm-btn" class="confirm">Ja</button></div>`)
+		confirm: (title) => UI.modal(`<h3>${title}</h3><div class="gm-modal-buttons"><button id="gm-cancel-btn">Nein</button><button id="gm-confirm-btn" class="confirm">Ja</button></div>`),
 	};
 
 	// Module for interacting with the page's DOM
 	const DOM = {
 		setFieldValue: (el, val) => {
-			if (!el) {return;}
+			if (!el) {
+				return;
+			}
 			const prototype = Object.getPrototypeOf(el);
 			const setter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
 			if (setter) {
@@ -141,8 +163,8 @@
 			title: document.getElementById('postad-title'),
 			price: document.getElementById('micro-frontend-price'),
 			description: document.getElementById('pstad-descrptn'),
-			fileInput: document.querySelector('#plupld input[type="file"]')
-		})
+			fileInput: document.querySelector('#plupld input[type="file"]'),
+		}),
 	};
 
 	// =========================================================================
@@ -155,7 +177,9 @@
 				const fields = DOM.getFields();
 				const currentTitle = fields.title.value;
 				const name = await UI.prompt('Name für die Vorlage:', currentTitle);
-				if (!name) {return;}
+				if (!name) {
+					return;
+				}
 				const templates = Storage.getText();
 				templates[name] = { title: currentTitle, price: fields.price.value, description: fields.description.value };
 				Storage.setText(templates);
@@ -166,7 +190,9 @@
 			load() {
 				const select = document.getElementById('tm-select');
 				const template = Storage.getText()[select.value];
-				if (!template) {return;}
+				if (!template) {
+					return;
+				}
 				const fields = DOM.getFields();
 				DOM.setFieldValue(fields.title, template.title);
 				DOM.setFieldValue(fields.price, template.price);
@@ -176,7 +202,9 @@
 			async rename() {
 				const select = document.getElementById('tm-select');
 				const oldName = select.value;
-				if (!Storage.getText()[oldName]) {return;}
+				if (!Storage.getText()[oldName]) {
+					return;
+				}
 				const newName = await UI.prompt('Neuer Name:', oldName);
 				if (newName && newName !== oldName) {
 					const templates = Storage.getText();
@@ -191,7 +219,9 @@
 			async delete() {
 				const select = document.getElementById('tm-select');
 				const name = select.value;
-				if (!Storage.getText()[name]) {return;}
+				if (!Storage.getText()[name]) {
+					return;
+				}
 				if (await UI.confirm(`Vorlage "${name}" wirklich löschen?`)) {
 					const templates = Storage.getText();
 					delete templates[name];
@@ -203,13 +233,15 @@
 			renderDropdown() {
 				const select = document.getElementById('tm-select');
 				const names = Object.keys(Storage.getText()).sort();
-				select.innerHTML = names.length ? names.map(n => `<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('') : `<option disabled>Keine Vorlagen</option>`;
-			}
+				select.innerHTML = names.length ? names.map(n => `<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('') : '<option disabled>Keine Vorlagen</option>';
+			},
 		},
 		Image: {
 			async render() {
 				const container = document.getElementById('image-manager-container');
-				if (!container) {return;}
+				if (!container) {
+					return;
+				}
 				const images = await Storage.execDB('getAll');
 				const groups = images.reduce((acc, image) => {
 					const group = image.group || 'Unsortierte Bilder';
@@ -240,15 +272,17 @@
                         </div>`;
 					}
 				} else {
-					html += `<p>Noch keine Bilder gespeichert.</p>`;
+					html += '<p>Noch keine Bilder gespeichert.</p>';
 				}
 
-				html += `<hr style="margin: 15px 0;"><span class="tm-button" data-action="save-all">Alle hochgeladenen Bilder sichern</span>`;
+				html += '<hr style="margin: 15px 0;"><span class="tm-button" data-action="save-all">Alle hochgeladenen Bilder sichern</span>';
 				container.innerHTML = html;
 			},
 			async handleEvent(e) {
 				const { action } = e.target.dataset;
-				if (!action) {return;}
+				if (!action) {
+					return;
+				}
 
 				if (action.startsWith('delete')) {
 					const { groupName } = e.target.dataset;
@@ -262,10 +296,14 @@
 				} else if (action === 'add-image') {
 					const id = parseInt(e.target.dataset.imgId, 10);
 					const imgData = (await Storage.execDB('getAll')).find(img => img.id === id);
-					if (!imgData) {return;}
+					if (!imgData) {
+						return;
+					}
 					UI.toast('Füge Bild hinzu...');
 					const { fileInput } = DOM.getFields();
-					if (!fileInput) {return UI.toast('Fehler: Upload-Feld nicht gefunden.');}
+					if (!fileInput) {
+						return UI.toast('Fehler: Upload-Feld nicht gefunden.');
+					}
 					const file = new File([imgData.blob], `kleinanzeigen-bild-${Date.now()}.jpg`, { type: 'image/jpeg' });
 					const dataTransfer = new DataTransfer();
 					dataTransfer.items.add(file);
@@ -277,9 +315,13 @@
 			},
 			injectSaveButton(imageEl) {
 				const saveBtnSpan = Array.from(document.querySelectorAll('#popup-image-edit button span')).find(s => s.textContent === 'Speichern');
-				if (!saveBtnSpan) {return;}
+				if (!saveBtnSpan) {
+					return;
+				}
 				const toolbar = saveBtnSpan.closest('div[class*="Toolbar--Group"]');
-				if (!toolbar || toolbar.querySelector('.tm-dialog-button')) {return;}
+				if (!toolbar || toolbar.querySelector('.tm-dialog-button')) {
+					return;
+				}
 				const ourButton = document.createElement('button');
 				ourButton.className = `${saveBtnSpan.closest('button').className} tm-dialog-button`;
 				ourButton.innerHTML = '<span>Für Vorlage sichern</span>';
@@ -299,12 +341,19 @@
 				const originalText = button.textContent;
 				button.style.pointerEvents = 'none'; button.style.opacity = '0.6';
 				const editButtons = Array.from(document.querySelectorAll('.pictureupload-thumbnails-edit'));
-				if (editButtons.length === 0) { UI.toast('Keine Bilder zum Sichern gefunden.'); button.style.pointerEvents = 'auto'; button.style.opacity = '1'; return; }
+				if (editButtons.length === 0) {
+					UI.toast('Keine Bilder zum Sichern gefunden.'); button.style.pointerEvents = 'auto'; button.style.opacity = '1'; return;
+				}
 				const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 				const waitFor = (selector, scope = document) => new Promise((resolve, reject) => {
 					const i = setInterval(() => {
-						const el = scope.querySelector(selector); if (el) { clearInterval(i); resolve(el); } }, 100);
-					setTimeout(() => { clearInterval(i); reject(); }, 5000);
+						const el = scope.querySelector(selector); if (el) {
+							clearInterval(i); resolve(el);
+						}
+					}, 100);
+					setTimeout(() => {
+						clearInterval(i); reject();
+					}, 5000);
 				});
 				for (let i = 0; i < editButtons.length; i++) {
 					button.textContent = `Speichere Bild ${i + 1} von ${editButtons.length}...`;
@@ -316,18 +365,20 @@
 						await waitFor('.gm-toast');
 						(await waitFor('button[aria-label="Schließen"]', dialog)).click();
 						await wait(500);
-					} catch (error) {
+					} catch {
 						UI.toast(`Fehler bei Bild ${i + 1}. Überspringe...`);
 						const openDialog = document.querySelector('dialog[open]');
-						if (openDialog) {openDialog.querySelector('button[aria-label="Schließen"]')?.click();}
+						if (openDialog) {
+							openDialog.querySelector('button[aria-label="Schließen"]')?.click();
+						}
 						await wait(500);
 					}
 				}
 				button.textContent = originalText;
 				button.style.pointerEvents = 'auto'; button.style.opacity = '1';
 				UI.toast('Alle Bilder wurden gesichert!');
-			}
-		}
+			},
+		},
 	};
 
 	// =========================================================================
@@ -370,7 +421,9 @@
 		textAnchor.insertAdjacentElement('afterend', textManagerNode);
 		textManagerNode.addEventListener('click', e => {
 			const { action } = e.target.dataset;
-			if (action && App.Text[action]) {App.Text[action]();}
+			if (action && App.Text[action]) {
+				App.Text[action]();
+			}
 		});
 
 		// --- Image Manager UI ---

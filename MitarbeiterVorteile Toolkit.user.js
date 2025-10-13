@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name				mitarbeitervorteile.de Toolkit
-// @namespace			1110101
-// @version				1.0.0
-// @description			Sort and filter offers on employee benefits portal by discount percentage
-// @author				1110101@oczc.de
-// @match				https://*.mitarbeitervorteile.de/offers.action*
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=mitarbeitervorteile.de
-// @grant				GM_addStyle
-// @run-at				document-idle
-// @license				MIT
-// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MitarbeiterVorteile%20Toolkit.user.js
-// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MitarbeiterVorteile%20Toolkit.user.js
+// @name         mitarbeitervorteile.de Toolkit
+// @namespace    1110101
+// @version      1.0.0
+// @description  Sort and filter offers on employee benefits portal by discount percentage
+// @author       1110101@oczc.de
+// @match        https://*.mitarbeitervorteile.de/offers.action*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=mitarbeitervorteile.de
+// @grant        GM_addStyle
+// @run-at       document-idle
+// @license      MIT
+// @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MitarbeiterVorteile%20Toolkit.user.js
+// @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MitarbeiterVorteile%20Toolkit.user.js
 // ==/UserScript==
 
 (function () {
@@ -25,14 +25,14 @@
 			discountBox: '.title .box .text',
 			discountTitle: '.title',
 			offersContainer: '.offers-list, .offers-grid, [class*="offers"]',
-			mainContent: '#container, main, .main-content'
+			mainContent: '#container, main, .main-content',
 		},
 		classes: {
 			controlsContainer: 'discount-controls',
 			sortButton: 'sort-btn',
 			filterButton: 'filter-btn',
-			active: 'active'
-		}
+			active: 'active',
+		},
 	};
 
 	// Global state
@@ -42,7 +42,7 @@
 		filterRanges: null, // Will be calculated dynamically
 		originalOrder: new Map(), // Store original order of offers
 		initialized: false, // Track if initialization is complete
-		pauseObserver: null // Function to pause MutationObserver during sorting
+		pauseObserver: null, // Function to pause MutationObserver during sorting
 	};
 
 	// Session storage key for state persistence
@@ -59,13 +59,13 @@
 			const state = {
 				sortState: GLOBAL_STATE.sortState,
 				filterState: GLOBAL_STATE.filterState,
-				currentPage: currentPage,
+				currentPage,
 				nativeSortValue: nativeSort,
 				timestamp: Date.now(),
-				url: window.location.pathname + window.location.search
+				url: window.location.pathname + window.location.search,
 			};
 			sessionStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
-		} catch (e) {
+		} catch {
 			// Silent fail
 		}
 	}
@@ -77,7 +77,7 @@
 	function loadState() {
 		try {
 			const stored = sessionStorage.getItem(STATE_STORAGE_KEY);
-			
+
 			if (!stored) return null;
 
 			const state = JSON.parse(stored);
@@ -96,7 +96,7 @@
 			}
 
 			return state;
-		} catch (e) {
+		} catch {
 			return null;
 		}
 	}
@@ -108,7 +108,7 @@
 	function getNativeSortValue() {
 		const sortContainer = document.querySelector('.sort.advanced-filter');
 		if (!sortContainer) return null;
-		
+
 		const activeOption = sortContainer.querySelector('.options.active');
 		return activeOption?.getAttribute('data-value') || null;
 	}
@@ -128,7 +128,7 @@
 		const activeOption = sortContainer.querySelector('.options.active');
 		const currentSort = activeOption?.getAttribute('data-value');
 		const isDiscountActive = currentSort === 'DISCOUNT';
-		
+
 		if (isDiscountActive) {
 			return true;
 		}
@@ -175,7 +175,7 @@
 			if (currentPage === 0) {
 				return; // Already on page 1
 			}
-			
+
 			// Find the link for page 1 (might have data-page="0" or no data-page)
 			const page1Link = document.querySelector('.pagination a[aria-label*="Gehe zu 1 Seite"]');
 			if (page1Link) {
@@ -202,7 +202,7 @@
 		if (!discountText) return 0;
 
 		// Clean up text
-		let text = discountText.trim();
+		const text = discountText.trim();
 
 		// Handle cashback format: "10% Cashback"
 		const cashbackMatch = text.match(/(\d+[.,]?\d*)\s*%?\s*[Cc]ashback/);
@@ -382,7 +382,7 @@
 			return {
 				high: [15, Infinity],
 				medium: [10, 15],
-				low: [0, 10]
+				low: [0, 10],
 			};
 		}
 
@@ -402,7 +402,7 @@
 		return {
 			low: [min, tertile1],
 			medium: [tertile1, tertile2],
-			high: [tertile2, max]
+			high: [tertile2, max],
 		};
 	}
 
@@ -414,7 +414,7 @@
 		if (GLOBAL_STATE.pauseObserver) {
 			GLOBAL_STATE.pauseObserver();
 		}
-		
+
 		if (GLOBAL_STATE.sortState === 'desc') {
 			sortOffersByDiscount(false);
 		} else if (GLOBAL_STATE.sortState === 'asc') {
@@ -432,7 +432,7 @@
 		if (GLOBAL_STATE.pauseObserver) {
 			GLOBAL_STATE.pauseObserver();
 		}
-		
+
 		filterOffersByDiscount(GLOBAL_STATE.filterState);
 	}
 
@@ -449,7 +449,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false }
+			off: { icon: '—', label: 'Sortierung aus', active: false },
 		};
 
 		const updateButtonUI = () => {
@@ -652,7 +652,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false }
+			off: { icon: '—', label: 'Sortierung aus', active: false },
 		};
 		const stateInfo = states[GLOBAL_STATE.sortState];
 		const baseColor = '#007bff';
@@ -721,7 +721,7 @@
 		paginationLinks.forEach(link => {
 			if (link.dataset.paginationListener) return; // Skip if already added
 			link.dataset.paginationListener = 'true';
-			
+
 			link.addEventListener('click', () => {
 				// Save state after a short delay to let the page change
 				setTimeout(() => {
@@ -736,23 +736,23 @@
 	 */
 	function makeOfferCardsMiddleClickable() {
 		const offerCards = document.querySelectorAll(CONFIG.selectors.offerCard);
-		
+
 		offerCards.forEach(card => {
 			// Skip if already processed
 			if (card.dataset.middleClickEnabled) return;
 			card.dataset.middleClickEnabled = 'true';
-			
+
 			const url = card.getAttribute('data-url');
 			if (!url) return;
-			
+
 			// Find the "Online" button (or similar action button)
 			const onlineButton = card.querySelector('button.stamp-online, button.button-default');
 			if (!onlineButton) return;
-			
+
 			// Get button properties before replacing
 			const buttonText = onlineButton.textContent;
 			const buttonClasses = onlineButton.className;
-			
+
 			// Create a link that looks like the button
 			const link = document.createElement('a');
 			link.href = url;
@@ -763,24 +763,24 @@
 				text-decoration: none;
 				cursor: pointer;
 			`;
-			
+
 			// Copy relevant attributes
 			if (onlineButton.hasAttribute('aria-label')) {
 				link.setAttribute('aria-label', onlineButton.getAttribute('aria-label'));
 			}
-			
+
 			// Save state when link is clicked (before navigation)
 			link.addEventListener('click', () => {
 				saveState();
 			});
-			
+
 			// Also save state on middle-click and Ctrl+Click
 			link.addEventListener('mousedown', (e) => {
 				if (e.button === 1 || (e.button === 0 && (e.ctrlKey || e.metaKey))) {
 					saveState();
 				}
 			});
-			
+
 			// Replace button with link
 			onlineButton.parentNode.replaceChild(link, onlineButton);
 		});
@@ -803,7 +803,7 @@
 
 		// Check if controls already exist
 		const controlsExist = document.querySelector(`.${CONFIG.classes.controlsContainer}`);
-		
+
 		// Get the offer list container
 		const offerList = document.querySelector(CONFIG.selectors.offerList);
 		if (!offerList) {
@@ -812,12 +812,12 @@
 
 		// Try to restore saved state
 		const savedState = loadState();
-		
+
 		if (savedState) {
 			// Restore state values
 			GLOBAL_STATE.sortState = savedState.sortState;
 			GLOBAL_STATE.filterState = savedState.filterState;
-			
+
 			// Restore native sort if it was saved
 			if (savedState.nativeSortValue === 'DISCOUNT') {
 				setTimeout(() => {
@@ -846,7 +846,7 @@
 		// Apply sort and filter (either restored state or default)
 		applySortState();
 		applyFilterState();
-		
+
 		// Update button UI to reflect current state
 		updateAllSortButtons();
 		updateAllFilterButtons(GLOBAL_STATE.filterState);
@@ -876,7 +876,7 @@
 	 */
 	function waitForContent() {
 		let observer = null;
-		
+
 		// Store reference to observer for temporary disconnect
 		GLOBAL_STATE.pauseObserver = () => {
 			if (observer) {
@@ -885,13 +885,13 @@
 					if (observer) {
 						observer.observe(document.body, {
 							childList: true,
-							subtree: true
+							subtree: true,
 						});
 					}
 				}, 300);
 			}
 		};
-		
+
 		// Use MutationObserver to watch for changes
 		observer = new MutationObserver((mutations) => {
 			let hasNewOfferCards = false;
@@ -908,9 +908,7 @@
 								if (!node.dataset.originalIndex && !node.dataset.middleClickEnabled) {
 									hasReallyNewCards = true;
 								}
-							}
-							// Or if it contains offer-cards
-							else if (node.querySelector?.(CONFIG.selectors.offerCard)) {
+							} else if (node.querySelector?.(CONFIG.selectors.offerCard)) {
 								const cards = node.querySelectorAll(CONFIG.selectors.offerCard);
 								cards.forEach(card => {
 									if (!card.dataset.originalIndex && !card.dataset.middleClickEnabled) {
@@ -939,14 +937,14 @@
 							card.dataset.originalIndex = index;
 						}
 					});
-					
+
 					// Re-apply current sort and filter (will pause observer automatically)
 					applySortState();
 					applyFilterState();
-					
+
 					// Make new cards clickable
 					makeOfferCardsMiddleClickable();
-					
+
 					// Update pagination listeners
 					addPaginationListeners();
 				}, 100);
@@ -956,7 +954,7 @@
 		// Start observing
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true
+			subtree: true,
 		});
 
 		// Initial initialization with a small delay to ensure DOM is ready

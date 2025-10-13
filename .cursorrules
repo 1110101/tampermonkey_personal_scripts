@@ -1,0 +1,64 @@
+# Cursor Rules for Tampermonkey Userscript Development
+
+## Code Style & Structure
+- Use modern JavaScript (ES2025+ features like const/let, arrow functions, template literals)
+- Prefer IIFEs (Immediately Invoked Function Expressions) for script isolation
+- Use classes for complex functionality when appropriate
+- Structure code with clear sections and comments for different features
+
+## Error Handling & Performance
+- Always include proper error handling with try-catch blocks
+- Use debouncing for performance-critical operations (resize, scroll, input events)
+- Implement cleanup functions to remove event listeners and observers when needed
+- Use MutationObserver for dynamic content instead of polling
+
+## Tampermonkey Best Practices
+- Include comprehensive @grant directives for all GM_* functions used
+- Use @run-at document-idle for most scripts to ensure DOM is ready
+- Add @downloadURL and @updateURL for automatic updates
+- Use descriptive @description fields without dates
+- Include @icon directives pointing to relevant favicons
+- Version format: X.X or X.X.X (semantic versioning)
+
+## Metadata Standards
+- Author: Use consistent format (e.g., "username@domain.com")
+- License: MIT for public repositories
+- Namespace: Use consistent identifier across all scripts
+- Match patterns: Be specific but not overly restrictive
+
+## Code Quality
+- Follow ESLint rules (no console errors, proper indentation with tabs)
+- Max line length: 180 characters for regular JS, unlimited for userscripts
+- Use single quotes for strings
+- Add JSDoc comments for complex functions
+- Test scripts thoroughly across different websites
+
+## Development Workflow
+- Run `npm run lint` before committing
+- Use `npm run count` to track script sizes
+- Commit frequently with descriptive but concise messages
+- Test scripts on target websites before release
+
+## Naming Conventions
+- Use camelCase for variables and functions
+- Use PascalCase for classes and constructors
+- Use UPPER_CASE for constants
+- Use kebab-case for file names
+- Prefix event handler functions with 'handle' or 'on'
+
+## Security & Privacy
+- Never log sensitive user data
+- Use GM_setValue/GM_getValue for script preferences
+- Be mindful of CORS restrictions and use appropriate @connect directives
+- Respect user privacy and avoid tracking
+
+## DOM Manipulation
+- Use modern selectors (querySelector, querySelectorAll)
+- Add error checking for DOM element existence
+- Use event delegation when appropriate
+- Clean up dynamically created elements
+
+## Cross-browser Compatibility
+- Test on multiple browsers when possible
+- Use feature detection rather than browser detection
+- Handle different Tampermonkey/Greasemonkey environments

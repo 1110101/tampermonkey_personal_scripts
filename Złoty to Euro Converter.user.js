@@ -1,20 +1,20 @@
 // ==UserScript==
-// @name				Złoty to Euro Converter
-// @namespace			1110101
-// @version				4.0
-// @description			Scans web pages for Polish Złoty (zł/zl) and displays the equivalent amount in Euro (€) in parentheses.
-// @author				1110101@oczc.de
-// @match				http://*/*
-// @match				https://*/*
-// @connect				open.er-api.com
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=nbp.pl
-// @grant				GM_xmlhttpRequest
-// @grant				GM_setValue
-// @grant				GM_getValue
-// @run-at				document-idle
-// @license				MIT
-// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Z%C5%82oty%20to%20Euro%20Converter.user.js
-// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Z%C5%82oty%20to%20Euro%20Converter.user.js
+// @name         Złoty to Euro Converter
+// @namespace    1110101
+// @version      4.0
+// @description  Scans web pages for Polish Złoty (zł/zl) and displays the equivalent amount in Euro (€) in parentheses.
+// @author       1110101@oczc.de
+// @match        http://*/*
+// @match        https://*/*
+// @connect      open.er-api.com
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=nbp.pl
+// @grant        GM_xmlhttpRequest
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @run-at       document-idle
+// @license      MIT
+// @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Z%C5%82oty%20to%20Euro%20Converter.user.js
+// @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Z%C5%82oty%20to%20Euro%20Converter.user.js
 // ==/UserScript==
 
 (async function () {
@@ -46,12 +46,12 @@
 						} else {
 							reject('EUR rate not found in API response.');
 						}
-					} catch (e) {
+					} catch {
 						reject('Failed to parse API response.');
 					}
 				},
 				onerror: (error) => reject('Failed to fetch exchange rate.', error),
-				ontimeout: () => reject('The request timed out.')
+				ontimeout: () => reject('The request timed out.'),
 			});
 		});
 	};
@@ -65,7 +65,9 @@
 		const lastFetch = await GM_getValue('pln_to_eur_last_fetch');
 		const isCacheValid = cachedRate && lastFetch && (Date.now() - lastFetch < CACHE_DURATION);
 
-		if (isCacheValid) {return cachedRate;}
+		if (isCacheValid) {
+			return cachedRate;
+		}
 
 		const rate = await fetchRateFromApi();
 		await GM_setValue('pln_to_eur_rate', rate);
@@ -82,23 +84,26 @@
      */
 	const convertCurrencyOnPage = (rate) => {
 		// Disconnect the observer to prevent it from reacting to its own DOM manipulations.
-		if (observer) {observer.disconnect();}
+		if (observer) {
+			observer.disconnect();
+		}
 
 		// Regex Explanation:
-		// ((\d{1,3}(?:,\d{3})*|\d+)(?:[.,]\d{1,2})?) - Captures the numeric amount, allowing for comma/period separators.
-		// \s?                                      - Optional space.
-		// (zł|zl)                                  - The currency symbol.
-		// (?!\s*\([^)]*€\))                        - Negative lookahead. Ensures the match is ignored if it's already followed by "(...€)".
+		// ((\d{1,3}(?:,\d{3})*|\d+)(?:[.,]\d{1,2})?) - Captures numeric amount
+		// \s? - Optional space
+		// (zł|zl) - Currency symbol
+		// (?!\s*\([^)]*€\)) - Negative lookahead for existing conversions
 		const priceRegex = /((\d{1,3}(?:,\d{3})*|\d+)(?:[.,]\d{1,2})?)\s?(zł|zl)(?!\s*\([^)]*€\))/gi;
 
 		const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
 			acceptNode: (node) => {
-				if (node.parentElement.tagName.match(/^(script|style|textarea)$/i) || !priceRegex.test(node.nodeValue)) {
+				if (node.parentElement.tagName.match(/^(script|style|textarea)$/i) ||
+					!priceRegex.test(node.nodeValue)) {
 					return NodeFilter.FILTER_REJECT;
 				}
-				priceRegex.lastIndex = 0; // Reset regex state for each node.
+				priceRegex.lastIndex = 0; // Reset regex state
 				return NodeFilter.FILTER_ACCEPT;
-			}
+			},
 		});
 
 		while (walker.nextNode()) {
@@ -107,7 +112,9 @@
 
 			const newText = originalText.replace(priceRegex, (match, amountStr) => {
 				const amountInZl = parseFloat(amountStr.replace(/,/g, '.'));
-				if (isNaN(amountInZl)) {return match;} // Failsafe
+				if (isNaN(amountInZl)) {
+					return match;
+				} // Failsafe
 
 				const amountInEur = (amountInZl * rate).toFixed(2);
 				return `${match} (${amountInEur}€)`;

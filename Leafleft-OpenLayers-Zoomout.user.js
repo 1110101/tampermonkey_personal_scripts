@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name				Zoomout with right click for Leafleft or OpenLayers
-// @namespace			1110101
-// @version				1.5
-// @description			Zoomout with right click for Leafleft or OpenLayers
-// @author				1110101@oczc.de
-// @match				*://*/*
-// @icon				https://www.google.com/s2/favicons?sz=64&domain=leaflet.org
-// @grant				none
-// @run-at				document-idle
-// @license				MIT
-// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Leafleft-OpenLayers-Zoomout.user.js
-// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Leafleft-OpenLayers-Zoomout.user.js
+// @name         Zoomout with right click for Leafleft or OpenLayers
+// @namespace    1110101
+// @version      1.5
+// @description  Zoomout with right click for Leafleft or OpenLayers
+// @author       1110101@oczc.de
+// @match        *://*/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=leaflet.org
+// @grant        none
+// @run-at       document-idle
+// @license      MIT
+// @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Leafleft-OpenLayers-Zoomout.user.js
+// @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Leafleft-OpenLayers-Zoomout.user.js
 // ==/UserScript==
 
 (function () {
@@ -22,11 +22,19 @@
 		const maps = [];
 		if (window.L && typeof window.L.Map === 'function') {
 			for (const k in window) {
-				try { if (window[k] instanceof window.L.Map) {maps.push(window[k]);} } catch (e) {}
+				try {
+					if (window[k] instanceof window.L.Map) {
+						maps.push(window[k]);
+					}
+				} catch {}
 			}
 		}
-		if (window.map && typeof window.map.zoomOut === 'function') {maps.push(window.map);}
-		if (window.karte && typeof window.karte.zoomOut === 'function') {maps.push(window.karte);}
+		if (window.map && typeof window.map.zoomOut === 'function') {
+			maps.push(window.map);
+		}
+		if (window.karte && typeof window.karte.zoomOut === 'function') {
+			maps.push(window.karte);
+		}
 		document.querySelectorAll('.leaflet-container').forEach((elem) => {
 			for (const key in elem) {
 				try {
@@ -35,7 +43,7 @@
                         typeof elem[key].zoomIn === 'function') {
 						maps.push(elem[key]);
 					}
-				} catch (e) {}
+				} catch {}
 			}
 		});
 		return Array.from(new Set(maps));
@@ -49,7 +57,7 @@
                     typeof window[k].zoomTo === 'function') {
 					return window[k];
 				}
-			} catch (e) {}
+			} catch {}
 		}
 		return null;
 	}
@@ -78,7 +86,11 @@
 		document.querySelectorAll('.leaflet-container').forEach((elem) => {
 			addDoubleRightClickListener(elem, () => {
 				const maps = getLeafletMaps();
-				maps.forEach(map => { try { map.zoomOut(); } catch (e) {} });
+				maps.forEach(map => {
+					try {
+						map.zoomOut();
+					} catch {}
+				});
 			});
 		});
 
@@ -87,7 +99,9 @@
 			addDoubleRightClickListener(elem, () => {
 				const map = getOpenLayersMap();
 				if (map) {
-					try { map.zoomTo(map.getZoom() - 1); } catch (e) {}
+					try {
+						map.zoomTo(map.getZoom() - 1);
+					} catch {}
 				}
 			});
 		});

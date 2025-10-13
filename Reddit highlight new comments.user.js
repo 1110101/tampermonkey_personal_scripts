@@ -1,14 +1,17 @@
 // ==UserScript==
-// @name        Reddit highlight new comments
-// @namespace   https://github.com/Farow/userscripts
-// @description Highlights new comments since your last visit
-// @include     /https?:\/\/[a-z]+\.reddit\.com\/r\/[\w:+-]+\/comments\/[\da-z]/
-// @version     3.0.1
-// @require     https://raw.githubusercontent.com/bgrins/TinyColor/master/tinycolor.js
-// @grant       GM_getValue
-// @grant       GM_setValue
-// @grant       GM_addStyle
-// @license     MIT
+// @name				Reddit highlight new comments
+// @namespace			https://github.com/Farow/userscripts
+// @version				3.0.1
+// @description			Highlights new comments since your last visit
+// @author				Farow, 1110101, Claude, Gemini
+// @include				/https?:\/\/[a-z]+\.reddit\.com\/r\/[\w:+-]+\/comments\/[\da-z]/
+// @require				https://raw.githubusercontent.com/bgrins/TinyColor/master/tinycolor.js
+// @icon				https://www.google.com/s2/favicons?sz=64&domain=reddit.com
+// @grant				GM_getValue
+// @grant				GM_setValue
+// @grant				GM_addStyle
+// @run-at				document-idle
+// @license				MIT
 // ==/UserScript==
 
 'use strict';

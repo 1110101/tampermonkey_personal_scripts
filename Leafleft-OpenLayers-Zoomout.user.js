@@ -1,11 +1,14 @@
 // ==UserScript==
-// @name         Leafleft-OpenLayers-Zoomout
-// @namespace    1110101
-// @version      1.4
-// @description  DOPPELTER Rechtsklick zoomt Leaflet/OpenLayers raus
-// @author       1110101@oczc.de
-// @match        *://*/*
-// @grant        none
+// @name				Zoomout with right click for Leafleft or OpenLayers
+// @namespace			1110101
+// @version				1.5
+// @description			Zoomout with right click for Leafleft or OpenLayers
+// @author				1110101@oczc.de
+// @match				*://*/*
+// @icon				https://www.google.com/s2/favicons?sz=64&domain=leaflet.org
+// @grant				none
+// @run-at				document-idle
+// @license				MIT
 // ==/UserScript==
 
 (function () {

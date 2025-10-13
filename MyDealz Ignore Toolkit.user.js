@@ -13,6 +13,8 @@
 // @grant				GM_registerMenuCommand
 // @run-at				document-idle
 // @license				MIT
+// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MyDealz%20Ignore%20Toolkit.user.js
+// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/MyDealz%20Ignore%20Toolkit.user.js
 // ==/UserScript==
 
 /*

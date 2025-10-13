@@ -12,6 +12,8 @@
 // @grant				GM_addStyle
 // @run-at				document-idle
 // @license				MIT
+// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Reddit%20highlight%20new%20comments.user.js
+// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Reddit%20highlight%20new%20comments.user.js
 // ==/UserScript==
 
 'use strict';

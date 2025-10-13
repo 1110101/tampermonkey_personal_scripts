@@ -13,6 +13,8 @@
 // @grant				GM_getValue
 // @run-at				document-idle
 // @license				MIT
+// @downloadURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Z%C5%82oty%20to%20Euro%20Converter.user.js
+// @updateURL			https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/Z%C5%82oty%20to%20Euro%20Converter.user.js
 // ==/UserScript==
 
 (async function () {

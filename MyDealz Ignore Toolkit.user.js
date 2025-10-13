@@ -1,24 +1,24 @@
 // ==UserScript==
-// @name         MyDealz Ignore Helper
-// @namespace    1110101
-// @version      4.3
-// @description  Ignore articles by keyword or manually, track read articles with visual markers
-// @author       1110101
-// @match        https://www.mydealz.de/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=mydealz.de
-// @grant        GM_addStyle
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @grant        GM_deleteValue
-// @grant        GM_registerMenuCommand
-// @run-at       document-idle
-// @license      MIT
+// @name				MyDealz Ignore Helper
+// @namespace			1110101
+// @version				4.4
+// @description			Ignore deals by keyword or manually, track read deals with visual markers
+// @author				1110101@oczc.de
+// @match				https://www.mydealz.de/*
+// @icon				https://www.google.com/s2/favicons?sz=64&domain=mydealz.de
+// @grant				GM_addStyle
+// @grant				GM_getValue
+// @grant				GM_setValue
+// @grant				GM_deleteValue
+// @grant				GM_registerMenuCommand
+// @run-at				document-idle
+// @license				MIT
 // ==/UserScript==
 
 /*
  * CHANGELOG
  *
- * v4.3 (2025-10-05)
+ * v4.3, v4.4 (2025-10-05)
  * - Added title ignore button with edit popup - extract keywords from article titles
  * - Added exact match toggle for keywords (whole word vs substring matching)
  * - Improved keyword matching with regex support for whole word matching

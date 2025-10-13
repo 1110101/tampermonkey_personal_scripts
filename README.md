@@ -3,22 +3,27 @@ Various userscripts for enhancing web browsing experience on external sites.
 
 ## Scripts
 
-### Corporate Benefits Discount Sorter
-Sorts and filters employee benefit offers by discount percentage on corporate benefits platforms. Analyzes all available discounts and dynamically creates three filter ranges (low, medium, high) based on actual data distribution using tertiles. Features a global control system where changing sort or filter options in one category automatically applies to all categories. Includes ad blocking and a 3-state sort toggle (highest first, lowest first, off). Perfect for quickly finding the best deals among employee perks.
+### CorporateBenefits Toolkit
+Company-agnostic toolkit for sorting and filtering employee benefit offers by discount percentage. Analyzes all available discounts and dynamically creates three filter ranges (low, medium, high) based on actual data distribution using tertiles. Features a global control system where changing sort or filter options in one category automatically applies to all categories. Includes ad blocking and a 3-state sort toggle (highest first, lowest first, off). Perfect for quickly finding the best deals among employee perks.
 
 **Websites:** https://*.mitarbeiterangebote.de/overview/*
 
-### KA Manager
+### MitarbeiterVorteile Toolkit
+Company-agnostic toolkit for sorting and filtering employee benefits portal offers by discount percentage. Intelligently parses various discount formats including standard percentages, German decimal format (4,5%), cashback offers, and complex promotional text. Automatically organizes offers from highest to lowest discount and provides dynamic filter ranges based on actual discount distribution. Features a clean, intuitive control panel with 3-state sorting and category filters for finding the best deals quickly.
+
+**Websites:** https://*.mitarbeitervorteile.de/offers.action*
+
+### Kleinanzeigen Toolkit
 Universal template and image manager for Kleinanzeigen (formerly eBay Kleinanzeigen). Provides centralized management of templates and media assets for creating and managing classified ads efficiently.
 
 **Websites:** https://www.kleinanzeigen.de/*
 
-### Leaflet-OpenLayers-Zoomout
+### Zoomout with right click for Leaflet or OpenLayers
 Modifies zoom behavior in Leaflet and OpenLayers map libraries. Changes default zoom interactions to provide better user experience for map-based applications.
 
 **Websites:** *://*/*
 
-### MyDealz Ignore Helper
+### MyDealz Ignore Toolkit
 Helps filter and ignore unwanted content on MyDealz deal-sharing platform. Improves browsing experience by hiding irrelevant or unwanted deal categories.
 
 **Websites:** https://www.mydealz.de/*
@@ -27,13 +32,6 @@ Helps filter and ignore unwanted content on MyDealz deal-sharing platform. Impro
 Highlights new comments on Reddit threads since your last visit. Helps users quickly identify new discussions and responses in long-running Reddit conversations.
 
 **Websites:** https://www.reddit.com/*
-
-### Universal Vorlagen- & Bild-Manager
-Universal template and image manager for content creation platforms. Provides centralized management of templates and media assets across different content management systems.
-
-**Websites:**
-- https://www.kleinanzeigen.de/p-anzeige-aufgeben-schritt2.html*
-- https://www.kleinanzeigen.de/p-anzeige-bearbeiten.html*
 
 ### Złoty to Euro Converter
 Converts Polish Złoty (PLN) to Euro currency with real-time exchange rates. Useful for international transactions and price comparisons involving Polish currency.

@@ -1,24 +1,22 @@
 // ==UserScript==
-// @name         KA Manager
-// @namespace    1110101
-// @version      5.1
-// @description Erweitert die Anzeigenseite um einen Vorlagen-Manager für Texte und Bilder. Die Funktion "Alle Bilder sichern" speichert komplette Bild-Gruppen, um sie für eine neue Anzeige sofort wieder parat zu haben.
-// @author       1110101@oczc.de
-// @match        https://www.kleinanzeigen.de/p-anzeige-aufgeben-schritt2.html*
-// @match        https://www.kleinanzeigen.de/p-anzeige-bearbeiten.html*
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_deleteValue
-// @grant        GM_addStyle
-// @run-at       document-idle
+// @name				Kleinanzeigen.de Toolkit
+// @namespace			1110101
+// @version				5.3
+// @description			Save all data including text and images on Kleinanzeigen.de to quickly reupload them
+// @author				1110101@oczc.de
+// @match				https://www.kleinanzeigen.de/p-anzeige-aufgeben-schritt2.html*
+// @match				https://www.kleinanzeigen.de/p-anzeige-bearbeiten.html*
+// @icon				https://www.google.com/s2/favicons?sz=64&domain=kleinanzeigen.de
+// @grant				GM_setValue
+// @grant				GM_getValue
+// @grant				GM_deleteValue
+// @grant				GM_addStyle
+// @run-at				document-idle
+// @license				MIT
 // ==/UserScript==
 
 (function () {
 	'use strict';
-
-	// =========================================================================
-	//  SETUP: Constants, Styles and Helper Modules
-	// =========================================================================
 
 	const CONFIG = {
 		TEMPLATES_KEY: 'kleinanzeigen_ad_templates',

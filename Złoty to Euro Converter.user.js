@@ -1,15 +1,18 @@
 // ==UserScript==
-// @name         Złoty to Euro Converter
-// @namespace    1110101
-// @version      4.0
-// @description  Scans web pages for Polish Złoty (zł/zl) and displays the equivalent amount in Euro (€) in parentheses.
-// @author       1110101@oczc.de
-// @match        http://*/*
-// @match        https://*/*
-// @connect      open.er-api.com
-// @grant        GM_xmlhttpRequest
-// @grant        GM_setValue
-// @grant        GM_getValue
+// @name				Złoty to Euro Converter
+// @namespace			1110101
+// @version				4.0
+// @description			Scans web pages for Polish Złoty (zł/zl) and displays the equivalent amount in Euro (€) in parentheses.
+// @author				1110101@oczc.de
+// @match				http://*/*
+// @match				https://*/*
+// @connect				open.er-api.com
+// @icon				https://www.google.com/s2/favicons?sz=64&domain=nbp.pl
+// @grant				GM_xmlhttpRequest
+// @grant				GM_setValue
+// @grant				GM_getValue
+// @run-at				document-idle
+// @license				MIT
 // ==/UserScript==
 
 (async function () {

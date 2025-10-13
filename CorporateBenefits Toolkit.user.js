@@ -1,24 +1,15 @@
 // ==UserScript==
-// @name         Corporate Benefits Discount Sorter
-// @namespace    1110101
-// @version      1.0.0
-// @description  Sort and filter offers on corporate benefits website by discount percentage
-// @author       1110101
-// @match        https://*.mitarbeiterangebote.de/overview/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=mitarbeiterangebote.de
-// @grant        GM_addStyle
-// @run-at       document-idle
-// @license      MIT
+// @name				CorporateBenefits Toolkit
+// @namespace			1110101
+// @version				1.1.0
+// @description			Sort and filter offers on corporate benefits website by discount percentage
+// @author				1110101@oczc.de
+// @match				https://*.mitarbeiterangebote.de/overview/*
+// @icon				https://www.google.com/s2/favicons?sz=64&domain=mitarbeiterangebote.de
+// @grant				GM_addStyle
+// @run-at				document-idle
+// @license				MIT
 // ==/UserScript==
-
-/*
- * CHANGELOG
- *
- * v1.0.0 (2025-10-09)
- * - Initial release.
- * - Sort and filter offers by discount.
- * - Handles dynamically loaded content.
- */
 
 (function () {
 	'use strict';

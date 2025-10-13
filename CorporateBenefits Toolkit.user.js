@@ -31,21 +31,21 @@
 			categoryContent: '.cbg3-category--content',
 			listItem: '.cbg3-list-item',
 			discountElement: '.cbg3-list-item--discount p',
-			categoryHead: '.cbg3-category--head',
+			categoryHead: '.cbg3-category--head'
 		},
 		classes: {
 			controlsContainer: 'cb-discount-controls',
 			sortButton: 'cb-sort-btn',
 			filterButton: 'cb-filter-btn',
-			active: 'active',
-		},
+			active: 'active'
+		}
 	};
 
 	// Global state for all categories
 	const GLOBAL_STATE = {
 		sortState: 'desc', // 'desc', 'asc', 'off'
 		filterState: 'all', // 'all', 'high', 'medium', 'low'
-		filterRanges: null, // Will be calculated dynamically: { high: [min, max], medium: [min, max], low: [min, max] }
+		filterRanges: null // Will be calculated dynamically: { high: [min, max], medium: [min, max], low: [min, max] }
 	};
 
 	/**
@@ -262,7 +262,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false },
+			off: { icon: '—', label: 'Sortierung aus', active: false }
 		};
 
 		const updateButtonUI = () => {
@@ -406,7 +406,7 @@
 			return {
 				high: [15, Infinity],
 				medium: [10, 15],
-				low: [0, 10],
+				low: [0, 10]
 			};
 		}
 
@@ -426,7 +426,7 @@
 		return {
 			low: [min, tertile1],
 			medium: [tertile1, tertile2],
-			high: [tertile2, max],
+			high: [tertile2, max]
 		};
 	}
 
@@ -476,7 +476,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false },
+			off: { icon: '—', label: 'Sortierung aus', active: false }
 		};
 		const stateInfo = states[GLOBAL_STATE.sortState];
 		const baseColor = '#007bff';
@@ -620,7 +620,7 @@
 		// Start observing
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true,
+			subtree: true
 		});
 
 		// Initial initialization with a small delay to ensure DOM is ready
@@ -697,7 +697,7 @@
 		// Start observing
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true,
+			subtree: true
 		});
 
 		// Initial fix with a small delay to ensure DOM is ready

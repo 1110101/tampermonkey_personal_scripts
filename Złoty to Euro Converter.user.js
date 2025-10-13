@@ -51,7 +51,7 @@
 					}
 				},
 				onerror: (error) => reject('Failed to fetch exchange rate.', error),
-				ontimeout: () => reject('The request timed out.'),
+				ontimeout: () => reject('The request timed out.')
 			});
 		});
 	};
@@ -103,7 +103,7 @@
 				}
 				priceRegex.lastIndex = 0; // Reset regex state
 				return NodeFilter.FILTER_ACCEPT;
-			},
+			}
 		});
 
 		while (walker.nextNode()) {

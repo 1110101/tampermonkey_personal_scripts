@@ -24,7 +24,7 @@
 		TEMPLATES_KEY: 'kleinanzeigen_ad_templates',
 		IMAGE_DB_NAME: 'KleinanzeigenImageDB',
 		IMAGE_STORE_NAME: 'saved_images',
-		DB_VERSION: 2,
+		DB_VERSION: 2
 	};
 
 	const STYLES = `
@@ -98,7 +98,7 @@
 				}
 			};
 			return new Promise(resolve => transaction.oncomplete = resolve);
-		},
+		}
 	};
 
 	const escapeHTML = (str) => {
@@ -141,7 +141,7 @@
 			overlay.querySelector('input')?.focus();
 		}),
 		prompt: (title, val = '') => UI.modal(`<h3>${title}</h3><input type="text" value="${val}"><div class="gm-modal-buttons"><button id="gm-cancel-btn">Abbrechen</button><button id="gm-confirm-btn" class="confirm">OK</button></div>`),
-		confirm: (title) => UI.modal(`<h3>${title}</h3><div class="gm-modal-buttons"><button id="gm-cancel-btn">Nein</button><button id="gm-confirm-btn" class="confirm">Ja</button></div>`),
+		confirm: (title) => UI.modal(`<h3>${title}</h3><div class="gm-modal-buttons"><button id="gm-cancel-btn">Nein</button><button id="gm-confirm-btn" class="confirm">Ja</button></div>`)
 	};
 
 	// Module for interacting with the page's DOM
@@ -163,8 +163,8 @@
 			title: document.getElementById('postad-title'),
 			price: document.getElementById('micro-frontend-price'),
 			description: document.getElementById('pstad-descrptn'),
-			fileInput: document.querySelector('#plupld input[type="file"]'),
-		}),
+			fileInput: document.querySelector('#plupld input[type="file"]')
+		})
 	};
 
 	// =========================================================================
@@ -181,7 +181,11 @@
 					return;
 				}
 				const templates = Storage.getText();
-				templates[name] = { title: currentTitle, price: fields.price.value, description: fields.description.value };
+				templates[name] = {
+					title: currentTitle,
+					price: fields.price.value,
+					description: fields.description.value
+				};
 				Storage.setText(templates);
 				this.renderDropdown();
 				document.getElementById('tm-select').value = name;
@@ -234,7 +238,7 @@
 				const select = document.getElementById('tm-select');
 				const names = Object.keys(Storage.getText()).sort();
 				select.innerHTML = names.length ? names.map(n => `<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`).join('') : '<option disabled>Keine Vorlagen</option>';
-			},
+			}
 		},
 		Image: {
 			async render() {
@@ -377,8 +381,8 @@
 				button.textContent = originalText;
 				button.style.pointerEvents = 'auto'; button.style.opacity = '1';
 				UI.toast('Alle Bilder wurden gesichert!');
-			},
-		},
+			}
+		}
 	};
 
 	// =========================================================================

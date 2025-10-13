@@ -137,7 +137,7 @@ const HNC = {
 				const elements = {
 					comment,
 					'text': comment.querySelector(usertextSelector),
-					'time': comment.querySelector(timestampSelector),
+					'time': comment.querySelector(timestampSelector)
 				};
 
 				const elementToStyle = elements[this.config.apply_on];
@@ -159,7 +159,7 @@ const HNC = {
 			const elements = {
 				comment,
 				'text': comment.querySelector('.usertext-body > .md'),
-				'time': comment.querySelector('time'),
+				'time': comment.querySelector('time')
 			};
 
 			for (const key in elements) {
@@ -211,11 +211,11 @@ const HNC = {
 		const color_final = window.tinycolor({
 			h: color_older.h + (color_newer.h - color_older.h) * time_diff,
 			s: color_older.s + (color_newer.s - color_older.s) * time_diff,
-			l: color_older.l + (color_newer.l - color_older.l) * time_diff,
+			l: color_older.l + (color_newer.l - color_older.l) * time_diff
 		});
 
 		return color_final.toHslString();
-	},
+	}
 };
 
 HNC.ui = {
@@ -598,7 +598,7 @@ HNC.ui = {
 		const elements = {
 			'comment': preview,
 			'text': preview.querySelector('.usertext-body > .md'),
-			'time': preview.querySelector('.live-timestamp'),
+			'time': preview.querySelector('.live-timestamp')
 		};
 
 		for (const [, element] of Object.entries(elements)) {
@@ -622,7 +622,7 @@ HNC.ui = {
 		if (elementToStyle) {
 			elementToStyle.setAttribute('style', HNC.generate_comment_style(comment_age, double_comment_age));
 		}
-	},
+	}
 };
 
 HNC.data = {
@@ -790,7 +790,7 @@ HNC.data = {
 		JnLoeCnVTcNP1oBfVBY97OiGzKxPbfEXHe+9yp7HYNIahPIqS4Eco3IzWPR9v11tqVu2HtmsysaQs2eNgsoCWdY8LKLfwmnVzWeJfmzrysdG3ibB
 		79aAvzBbjamIxWItzOylDg2oGXVqZCIr5mSwJz2uoeZWNput19p7kPNJrjw7p67Ty+Vy8iaPAswdeZj2sJAtGArKwyPpZVIs0Sckv6d/Qmi3XHfh
 		N+4XuB5Yz6XWxkwzC76YXoxOjI/w0oarkew5ExlnFW2Mu7VNMGSPKPhKMOhH8BvOyeen8YeDp/sVzeSvMqL246FnbV32SPdpTa0q8Ly/60amOe0Z
-		Tw0AAAAASUVORK5CYII=)`,
+		Tw0AAAAASUVORK5CYII=)`
 };
 
 HNC.cfg = {
@@ -811,9 +811,9 @@ HNC.cfg = {
 			'apply_on': 'text',
 			'comment_style': 'background-color: %color !important;\npadding: 0 5px;',
 			'history': {},
-			'history_expiration': 7, // in days
+			'history_expiration': 7 // in days
 		};
-	},
+	}
 };
 
 /* original authored by TheBrain, at http://stackoverflow.com/a/12475270 - slightly modified for ES6 */
@@ -852,7 +852,7 @@ function time_ago(time, _precision = 2) {
 		[4838400, 'Last month', 'Next month'],
 		[29030400, 'months', 2419200],
 		[58060800, 'Last year', 'Next year'],
-		[2903040000, 'years', 29030400],
+		[2903040000, 'years', 29030400]
 	];
 
 	const seconds = (Date.now() - timeInput) / 1000;

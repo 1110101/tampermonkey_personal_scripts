@@ -25,14 +25,14 @@
 			discountBox: '.title .box .text',
 			discountTitle: '.title',
 			offersContainer: '.offers-list, .offers-grid, [class*="offers"]',
-			mainContent: '#container, main, .main-content',
+			mainContent: '#container, main, .main-content'
 		},
 		classes: {
 			controlsContainer: 'discount-controls',
 			sortButton: 'sort-btn',
 			filterButton: 'filter-btn',
-			active: 'active',
-		},
+			active: 'active'
+		}
 	};
 
 	// Global state
@@ -42,7 +42,7 @@
 		filterRanges: null, // Will be calculated dynamically
 		originalOrder: new Map(), // Store original order of offers
 		initialized: false, // Track if initialization is complete
-		pauseObserver: null, // Function to pause MutationObserver during sorting
+		pauseObserver: null // Function to pause MutationObserver during sorting
 	};
 
 	// Session storage key for state persistence
@@ -62,7 +62,7 @@
 				currentPage,
 				nativeSortValue: nativeSort,
 				timestamp: Date.now(),
-				url: window.location.pathname + window.location.search,
+				url: window.location.pathname + window.location.search
 			};
 			sessionStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
 		} catch {
@@ -78,7 +78,7 @@
 		try {
 			const stored = sessionStorage.getItem(STATE_STORAGE_KEY);
 
-			if (!stored) return null;
+			if (!stored) {return null;}
 
 			const state = JSON.parse(stored);
 
@@ -107,7 +107,7 @@
 	 */
 	function getNativeSortValue() {
 		const sortContainer = document.querySelector('.sort.advanced-filter');
-		if (!sortContainer) return null;
+		if (!sortContainer) {return null;}
 
 		const activeOption = sortContainer.querySelector('.options.active');
 		return activeOption?.getAttribute('data-value') || null;
@@ -199,7 +199,7 @@
 	 * @returns {number} - Numeric value for sorting (higher = better discount)
 	 */
 	function parseDiscountValue(discountText) {
-		if (!discountText) return 0;
+		if (!discountText) {return 0;}
 
 		// Clean up text
 		const text = discountText.trim();
@@ -253,7 +253,7 @@
 	function getOfferDiscountValue(offerCard) {
 		// Find the offer-details inside the card
 		const offerDetails = offerCard.querySelector(CONFIG.selectors.offerDetails);
-		if (!offerDetails) return 0;
+		if (!offerDetails) {return 0;}
 
 		// Try to find discount in .title .box .text first
 		const discountBox = offerDetails.querySelector(CONFIG.selectors.discountBox);
@@ -291,11 +291,11 @@
 	 */
 	function sortOffersByDiscount(ascending = false) {
 		const offerCards = Array.from(document.querySelectorAll(CONFIG.selectors.offerCard));
-		if (offerCards.length === 0) return;
+		if (offerCards.length === 0) {return;}
 
 		// Get the parent container (offer-list)
 		const offerList = document.querySelector(CONFIG.selectors.offerList);
-		if (!offerList) return;
+		if (!offerList) {return;}
 
 		// Sort by discount value
 		offerCards.sort((a, b) => {
@@ -320,10 +320,10 @@
 	 */
 	function restoreOriginalOrder() {
 		const offerCards = Array.from(document.querySelectorAll(CONFIG.selectors.offerCard));
-		if (offerCards.length === 0) return;
+		if (offerCards.length === 0) {return;}
 
 		const offerList = document.querySelector(CONFIG.selectors.offerList);
-		if (!offerList) return;
+		if (!offerList) {return;}
 
 		// Sort by original index
 		offerCards.sort((a, b) => {
@@ -382,14 +382,14 @@
 			return {
 				high: [15, Infinity],
 				medium: [10, 15],
-				low: [0, 10],
+				low: [0, 10]
 			};
 		}
 
 		// Sort discounts to find percentiles
 		allDiscounts.sort((a, b) => a - b);
 
-		const min = allDiscounts[0];
+		const [min] = allDiscounts;
 		const max = allDiscounts[allDiscounts.length - 1];
 
 		// Calculate tertiles (33rd and 66th percentile)
@@ -402,7 +402,7 @@
 		return {
 			low: [min, tertile1],
 			medium: [tertile1, tertile2],
-			high: [tertile2, max],
+			high: [tertile2, max]
 		};
 	}
 
@@ -449,7 +449,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false },
+			off: { icon: '—', label: 'Sortierung aus', active: false }
 		};
 
 		const updateButtonUI = () => {
@@ -652,7 +652,7 @@
 		const states = {
 			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false },
+			off: { icon: '—', label: 'Sortierung aus', active: false }
 		};
 		const stateInfo = states[GLOBAL_STATE.sortState];
 		const baseColor = '#007bff';
@@ -719,7 +719,7 @@
 	function addPaginationListeners() {
 		const paginationLinks = document.querySelectorAll('.pagination a');
 		paginationLinks.forEach(link => {
-			if (link.dataset.paginationListener) return; // Skip if already added
+			if (link.dataset.paginationListener) {return;} // Skip if already added
 			link.dataset.paginationListener = 'true';
 
 			link.addEventListener('click', () => {
@@ -739,15 +739,15 @@
 
 		offerCards.forEach(card => {
 			// Skip if already processed
-			if (card.dataset.middleClickEnabled) return;
+			if (card.dataset.middleClickEnabled) {return;}
 			card.dataset.middleClickEnabled = 'true';
 
 			const url = card.getAttribute('data-url');
-			if (!url) return;
+			if (!url) {return;}
 
 			// Find the "Online" button (or similar action button)
 			const onlineButton = card.querySelector('button.stamp-online, button.button-default');
-			if (!onlineButton) return;
+			if (!onlineButton) {return;}
 
 			// Get button properties before replacing
 			const buttonText = onlineButton.textContent;
@@ -885,7 +885,7 @@
 					if (observer) {
 						observer.observe(document.body, {
 							childList: true,
-							subtree: true,
+							subtree: true
 						});
 					}
 				}, 300);
@@ -954,7 +954,7 @@
 		// Start observing
 		observer.observe(document.body, {
 			childList: true,
-			subtree: true,
+			subtree: true
 		});
 
 		// Initial initialization with a small delay to ensure DOM is ready

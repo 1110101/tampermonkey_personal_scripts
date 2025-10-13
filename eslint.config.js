@@ -1,75 +1,148 @@
-import js from '@eslint/js';
-import userscriptsPlugin from 'eslint-plugin-userscripts';
-import globals from 'globals';
+const js = require('@eslint/js');
+const userscripts = require('eslint-plugin-userscripts');
 
-export default [
+module.exports = [
 	js.configs.recommended,
 	{
-		files: ['**/*.js'],
+		files: ['**/*.js', '**/*.user.js'],
+		ignores: [
+			'node_modules/**',
+			'*.min.js',
+			'*.bundle.js',
+			'coverage/**',
+			'dist/**',
+			'build/**',
+			'.git/**',
+			'.vscode/**',
+			'.idea/**',
+			'*.log',
+			'package-lock.json',
+			'yarn.lock',
+			'pnpm-lock.yaml'
+		],
 		languageOptions: {
-			ecmaVersion: 'latest',
-			sourceType: 'module',
+			ecmaVersion: 2025,
+			sourceType: 'script',
 			globals: {
-				...globals.browser,
-				...globals.node,
-				// Tampermonkey globals
-				GM_addStyle: 'readonly',
-				GM_addElement: 'readonly',
-				GM_deleteValue: 'readonly',
-				GM_getResourceText: 'readonly',
-				GM_getResourceURL: 'readonly',
-				GM_getValue: 'readonly',
-				GM_info: 'readonly',
-				GM_listValues: 'readonly',
-				GM_log: 'readonly',
-				GM_openInTab: 'readonly',
-				GM_registerMenuCommand: 'readonly',
-				GM_setClipboard: 'readonly',
-				GM_setValue: 'readonly',
-				GM_unregisterMenuCommand: 'readonly',
-				GM_xmlhttpRequest: 'readonly',
-				GM_download: 'readonly',
-				GM_getTab: 'readonly',
-				GM_saveTab: 'readonly',
-				GM_getTabs: 'readonly',
-				GM_notification: 'readonly',
-				GM_addValueChangeListener: 'readonly',
-				GM_removeValueChangeListener: 'readonly',
-				unsafeWindow: 'readonly',
-				cloneInto: 'readonly',
-				exportFunction: 'readonly',
-			},
+				// Node.js globals for config file
+				require: 'readonly',
+				module: 'readonly',
+				exports: 'readonly',
+				__dirname: 'readonly',
+				__filename: 'readonly',
+				process: 'readonly',
+				Buffer: 'readonly',
+				global: 'readonly'
+			}
 		},
 		rules: {
-			'no-console': 'off',
-			indent: ['error', 'tab', { SwitchCase: 1 }],
-			quotes: ['error', 'single'],
-			'max-len': ['error', { code: 180, ignoreUrls: true, ignoreStrings: false }],
-			'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-			'prefer-const': 'error',
-			'no-var': 'error',
-			'object-shorthand': 'error',
-			'prefer-arrow-callback': 'error',
-			'arrow-spacing': 'error',
-			'brace-style': ['error', '1tbs'],
-			'comma-dangle': ['error', 'always-multiline'],
-			'eol-last': 'error',
-			'no-trailing-spaces': 'error',
-			'no-empty': ['error', { allowEmptyCatch: true }],
+			// Basic rules
+			'no-unused-vars': ['error', {
+				'argsIgnorePattern': '^_',
+				'varsIgnorePattern': '^_',
+				'caughtErrorsIgnorePattern': '^_'
+			}],
+			'no-undef': 'error',
+			'no-console': 'off', // Allow console.log for debugging
+			'no-alert': 'warn',
+
+			// Stylistic rules
+			'indent': ['error', 'tab', {
+				'SwitchCase': 1,
+				'VariableDeclarator': 1,
+				'outerIIFEBody': 1,
+				'FunctionDeclaration': { 'parameters': 1, 'body': 1 },
+				'FunctionExpression': { 'parameters': 1, 'body': 1 },
+				'CallExpression': { 'arguments': 1 },
+				'ArrayExpression': 1,
+				'ObjectExpression': 1,
+				'ImportDeclaration': 1,
+				'flatTernaryExpressions': false,
+				'ignoreComments': false
+			}],
+			'quotes': ['error', 'single', { 'avoidEscape': true, 'allowTemplateLiterals': true }],
 			'semi': ['error', 'always'],
-		},
+			'max-len': ['error', {
+				'code': 120,
+				'tabWidth': 4,
+				'ignoreUrls': true,
+				'ignoreStrings': true,
+				'ignoreTemplateLiterals': true,
+				'ignoreRegExpLiterals': true,
+				'ignoreComments': true
+			}],
+			'no-trailing-spaces': 'error',
+			'no-mixed-spaces-and-tabs': 'error',
+			'comma-dangle': ['error', 'never'],
+			'no-empty': ['error', { 'allowEmptyCatch': true }],
+			'object-curly-spacing': ['error', 'always'],
+			'array-bracket-spacing': ['error', 'never'],
+			'comma-spacing': ['error', { 'before': false, 'after': true }],
+			'key-spacing': ['error', { 'beforeColon': false, 'afterColon': true }],
+			'keyword-spacing': ['error', { 'before': true, 'after': true }],
+			'space-before-function-paren': ['error', {
+				'anonymous': 'always',
+				'named': 'never',
+				'asyncArrow': 'always'
+			}],
+			'space-infix-ops': 'error',
+			'curly': ['error', 'all'],
+			'eqeqeq': ['error', 'always'],
+
+			// ES6+ features
+			'prefer-const': 'error',
+			'prefer-arrow-callback': 'error',
+			'prefer-template': 'error',
+			'prefer-destructuring': ['error', {
+				'array': true,
+				'object': true
+			}, {
+				'enforceForRenamedProperties': false
+			}],
+			'arrow-spacing': ['error', { 'before': true, 'after': true }],
+			'template-curly-spacing': ['error', 'never'],
+			'rest-spread-spacing': ['error', 'never'],
+
+			// Userscript specific
+			'no-eval': 'error',
+			'no-implied-eval': 'error',
+			'no-new-func': 'error'
+		}
 	},
 	{
 		files: ['**/*.user.js'],
+		ignores: ['node_modules/**'],
 		plugins: {
-			userscripts: userscriptsPlugin,
+			userscripts
+		},
+		languageOptions: {
+			ecmaVersion: 2025,
+			sourceType: 'script',
+			globals: {
+				// Browser environment globals (built-in)
+				...require('globals').browser,
+				// Tampermonkey/Greasemonkey specific globals
+				GM_addStyle: 'readonly',
+				GM_setValue: 'readonly',
+				GM_getValue: 'readonly',
+				GM_deleteValue: 'readonly',
+				GM_listValues: 'readonly',
+				GM_registerMenuCommand: 'readonly',
+				GM_unregisterMenuCommand: 'readonly',
+				GM_xmlhttpRequest: 'readonly',
+				GM_openInTab: 'readonly',
+				GM_notification: 'readonly',
+				GM_setClipboard: 'readonly',
+				GM_getResourceText: 'readonly',
+				GM_getResourceURL: 'readonly',
+				GM_info: 'readonly',
+				unsafeWindow: 'readonly'
+			}
 		},
 		rules: {
-			...userscriptsPlugin.configs.recommended.rules,
-			'max-len': 'off', // Allow longer lines in userscripts for URLs, selectors, etc.
-		},
-	},
-	{
-		ignores: ['node_modules/**', '*.min.js'],
-	},
+			// Override some rules for userscripts
+			'no-console': 'off', // Allow console.log for debugging in userscripts
+			'no-alert': 'warn' // Allow alert for notifications (with warning)
+		}
+	}
 ];

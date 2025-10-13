@@ -428,7 +428,7 @@
 				const arrKeywords = GM_getValue('ignoreKeywords', []);
 				const objKeyword = {
 					keyword: strKeyword,
-					exactMatch: elExactMatchCheckbox.checked,
+					exactMatch: elExactMatchCheckbox.checked
 				};
 
 				// Check if keyword already exists
@@ -497,7 +497,7 @@
 				const arrKeywords = GM_getValue('ignoreKeywords', []);
 				const objKeyword = {
 					keyword: strKeyword,
-					exactMatch: elExactMatchToggle.checked,
+					exactMatch: elExactMatchToggle.checked
 				};
 
 				// Check if keyword already exists

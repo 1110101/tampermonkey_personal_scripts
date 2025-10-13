@@ -1,8 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 
 # Logs
 *.log
@@ -12,116 +9,53 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-.nyc_output/
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-out/
-
-# Nuxt.js build / generate output
-.nuxt
-dist/
-
-# Gatsby files
-.cache/
-public
-
-# Storybook build outputs
-.out
-.storybook-out
-
-# Temporary folders
-tmp/
-temp/
-
-# Editor directories and files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
 # Environment variables
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
-# Build outputs
-build/
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing / Coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Build output
 dist/
-*.min.js
-*.min.css
+build/
+out/
+*.tgz
 
-# Cache directories
-.cache/
-.parcel-cache/
-.vite/
+# Cache files
+.cache
+.eslintcache
+.stylelintcache
+.parcel-cache
+*.tsbuildinfo
 
-# Database
-*.sqlite
-*.sqlite3
-*.db
+# Optional npm/yarn files
+.npm
+.yarn-integrity
+.pnp.*
+.yarn/
 
-# AWS
-.serverless/
+# Lock files (optional - uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
 
-# Vercel
-.vercel
+# OS files
+.DS_Store
+Thumbs.db
 
-# Netlify
-.netlify/
-
-# Firebase
-.firebase/
-
-# Docker
-Dockerfile*
-docker-compose*.yml
-.dockerignore
-
-# Local development
-.local
-dev/
-tmp/
+# Temporary files
+*.tmp
+*.temp
+.temp

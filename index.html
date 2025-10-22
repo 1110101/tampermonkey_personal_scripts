@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Primary Meta Tags -->
+	<title>Personal Tampermonkey Scripts - Browser Enhancement Collection</title>
+	<meta name="title" content="Personal Tampermonkey Scripts - Browser Enhancement Collection">
+	<meta name="description" content="A curated collection of powerful Tampermonkey userscripts for enhancing your browsing experience. From deal sorting to price conversion, Reddit enhancements, and map tools.">
+	<meta name="keywords" content="Tampermonkey, UserScripts, Browser Extensions, JavaScript, Web Enhancement, Deal Sorting, Price Conversion, Reddit, OpenLayers, Kleinanzeigen">
+	<meta name="author" content="1110101@oczc.de">
+	<meta name="robots" content="index, follow">
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://github.com/1110101/tampermonkey_personal_scripts">
+	<meta property="og:title" content="Personal Tampermonkey Scripts - Browser Enhancement Collection">
+	<meta property="og:description" content="A curated collection of powerful Tampermonkey userscripts for enhancing your browsing experience.">
+	<meta property="og:site_name" content="Personal Tampermonkey Scripts">
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:url" content="https://github.com/1110101/tampermonkey_personal_scripts">
+	<meta property="twitter:title" content="Personal Tampermonkey Scripts - Browser Enhancement Collection">
+	<meta property="twitter:description" content="A curated collection of powerful Tampermonkey userscripts for enhancing your browsing experience.">
+
+	<!-- Favicon -->
+	<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+
+	<!-- Canonical URL -->
+	<link rel="canonical" href="https://github.com/1110101/tampermonkey_personal_scripts">
+
+	<!-- Performance & Security -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="theme-color" content="#0d9488">
+	<meta name="color-scheme" content="dark light">
+
+	<!-- Preconnect to external resources for faster loading -->
+	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+	<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+	<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+	<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+	<!-- Bootstrap 5 CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+	<!-- Bootstrap Icons -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+	<!-- Schema.org Structured Data -->
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "SoftwareSourceCode",
+		"name": "Personal Tampermonkey Scripts",
+		"description": "A curated collection of powerful Tampermonkey userscripts for enhancing your browsing experience. From deal sorting to price conversion, Reddit enhancements, and map tools.",
+		"url": "https://github.com/1110101/tampermonkey_personal_scripts",
+		"author": {
+			"@type": "Person",
+			"name": "1110101",
+			"email": "1110101@oczc.de"
+		},
+		"programmingLanguage": "JavaScript",
+		"codeRepository": "https://github.com/1110101/tampermonkey_personal_scripts",
+		"keywords": "Tampermonkey, UserScripts, Browser Extensions, Deal Sorting, Price Conversion",
+		"applicationCategory": "DeveloperApplication",
+		"operatingSystem": "Cross-platform",
+		"offers": {
+			"@type": "Offer",
+			"price": "0",
+			"priceCurrency": "USD"
+		}
+	}
+	</script>
+
+	<style>
+		:root {
+			--primary-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+			--secondary-gradient: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+			--teal: #0d9488;
+			--cyan: #06b6d4;
+			--green: #10b981;
+			--emerald: #059669;
+		}
+
+		body {
+			overflow-x: hidden;
+		}
+
+		/* Vanta background container */
+		#vanta-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: -1;
+		}
+
+		/* Hero section */
+		.hero-section {
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+		}
+
+		.hero-content {
+			background: rgba(255, 255, 255, 0.98);
+			backdrop-filter: blur(20px);
+			border-radius: 25px;
+			padding: 3.5rem;
+			box-shadow: 0 25px 80px rgba(13, 148, 136, 0.4);
+			max-width: 900px;
+			margin: 0 auto;
+			border: 1px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.hero-title {
+			font-size: 3.2rem;
+			font-weight: 800;
+			background: var(--primary-gradient);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			margin-bottom: 1.5rem;
+			line-height: 1.3;
+			text-align: center;
+		}
+
+		.hero-title i {
+			display: inline-block;
+			margin-right: 0.5rem;
+		}
+
+		.hero-subtitle {
+			font-size: 1.3rem;
+			color: #555;
+			margin-bottom: 2rem;
+		}
+
+		/* Feature cards */
+		.feature-section {
+			position: relative;
+			padding: 5rem 0;
+			background: linear-gradient(180deg, rgba(10, 15, 30, 0.75) 0%, rgba(10, 15, 30, 0.4) 75%);
+		}
+
+		.feature-card {
+			background: white;
+			border-radius: 15px;
+			padding: 2rem;
+			height: 100%;
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			border: 1px solid rgba(0, 0, 0, 0.1);
+		}
+
+		.feature-card:hover {
+			transform: translateY(-10px);
+			box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+		}
+
+		.feature-icon {
+			width: 70px;
+			height: 70px;
+			background: var(--primary-gradient);
+			border-radius: 15px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-bottom: 1.5rem;
+		}
+
+		.feature-icon i {
+			font-size: 2rem;
+			color: white;
+		}
+
+		.feature-title {
+			font-size: 1.5rem;
+			font-weight: 700;
+			margin-bottom: 1rem;
+			color: #333;
+		}
+
+		.feature-text {
+			color: #666;
+			line-height: 1.6;
+		}
+
+		/* CTA Section */
+		.cta-section {
+			position: relative;
+			padding: 5rem 0;
+			background: linear-gradient(180deg, rgba(10, 15, 30, 0.75) 0%, rgba(10, 15, 30, 0.85) 100%);
+		}
+
+		.cta-box {
+			background: var(--secondary-gradient);
+			border-radius: 20px;
+			padding: 4rem 2rem;
+			text-align: center;
+			color: white;
+			box-shadow: 0 20px 60px rgba(13, 148, 136, 0.4);
+		}
+
+		.cta-title {
+			font-size: 2.5rem;
+			font-weight: 800;
+			margin-bottom: 1rem;
+		}
+
+		.cta-text {
+			font-size: 1.2rem;
+			margin-bottom: 2rem;
+			opacity: 0.95;
+		}
+
+		/* Buttons */
+		.btn-primary-custom,
+		.btn-success-custom,
+		.btn-outline-custom {
+			padding: 0.875rem 2rem;
+			font-size: 1.1rem;
+			font-weight: 600;
+			border-radius: 50px;
+			transition: all 0.3s ease;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			line-height: 1.5;
+		}
+
+		.btn-primary-custom {
+			background: var(--primary-gradient);
+			border: none;
+			box-shadow: 0 5px 15px rgba(17, 153, 142, 0.5);
+			color: white;
+		}
+
+		.btn-primary-custom:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 10px 25px rgba(56, 239, 125, 0.7);
+			color: white;
+		}
+
+		.btn-success-custom {
+			background: var(--secondary-gradient);
+			border: none;
+			box-shadow: 0 5px 15px rgba(13, 148, 136, 0.5);
+			color: white;
+		}
+
+		.btn-success-custom:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 10px 25px rgba(20, 184, 166, 0.7);
+			color: white;
+		}
+
+		.btn-outline-custom {
+			border: 2px solid white;
+			color: white;
+			background: transparent;
+		}
+
+		.btn-outline-custom:hover {
+			background: white;
+			color: #0d9488;
+			transform: translateY(-3px);
+		}
+
+		.btn-outline-dark {
+			border: 2px solid #333;
+			color: #333;
+			background: transparent;
+			padding: 0.875rem 2rem;
+			font-size: 1.1rem;
+			font-weight: 600;
+			border-radius: 50px;
+			transition: all 0.3s ease;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			line-height: 1.5;
+		}
+
+		.btn-outline-dark:hover {
+			background: #333;
+			color: white;
+			transform: translateY(-3px);
+		}
+
+		.btn-light {
+			background: white;
+			color: #0d9488;
+			border: 2px solid white;
+			padding: 0.875rem 2rem;
+			font-size: 1.1rem;
+			font-weight: 600;
+			border-radius: 50px;
+			transition: all 0.3s ease;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			line-height: 1.5;
+		}
+
+		.btn-light:hover {
+			background: transparent;
+			color: white;
+			border-color: white;
+			transform: translateY(-3px);
+		}
+
+		/* Script Cards */
+		.script-card {
+			background: white;
+			border-radius: 15px;
+			padding: 2rem;
+			height: 100%;
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.script-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 15px 40px rgba(17, 153, 142, 0.3);
+		}
+
+		.script-card-footer {
+			margin-top: auto;
+			padding-top: 1rem;
+		}
+
+		.script-title {
+			font-size: 1.3rem;
+			font-weight: 700;
+			color: #0d9488;
+			margin-bottom: 0.5rem;
+		}
+
+		.script-description {
+			color: #666;
+			line-height: 1.6;
+			margin-bottom: 1rem;
+		}
+
+		.script-features {
+			list-style: none;
+			padding-left: 0;
+			margin-bottom: 1rem;
+		}
+
+		.script-features li {
+			padding: 0.3rem 0;
+			color: #555;
+		}
+
+		.script-features li:before {
+			content: "▸ ";
+			color: #0d9488;
+			font-weight: bold;
+		}
+
+		.badge-website {
+			background: linear-gradient(135deg, rgba(17, 153, 142, 0.15), rgba(56, 239, 125, 0.15));
+			color: #0d9488;
+			padding: 0.4rem 0.8rem;
+			border-radius: 20px;
+			font-size: 0.85rem;
+			margin-right: 0.5rem;
+			margin-bottom: 0.5rem;
+			display: inline-block;
+			border: 1px solid rgba(13, 148, 136, 0.3);
+		}
+
+		/* How-to Section */
+		.how-to-section {
+			position: relative;
+			padding: 5rem 0;
+			background: linear-gradient(180deg, rgba(10, 15, 30, 0.85) 0%, rgba(10, 15, 30, 0.75) 100%);
+		}
+
+		.section-title-dark {
+			color: #ffffff !important;
+			text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+			font-weight: 800 !important;
+		}
+
+		.section-subtitle-dark {
+			color: #ffffff !important;
+			opacity: 0.95;
+		}
+
+		.step-number {
+			width: 60px;
+			height: 60px;
+			background: var(--secondary-gradient);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.8rem;
+			font-weight: 800;
+			color: white;
+			margin-bottom: 1rem;
+		}
+
+		.step-title {
+			font-size: 1.5rem;
+			font-weight: 800;
+			color: #5eead4;
+			margin-bottom: 1rem;
+			text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+		}
+
+		.step-content {
+			color: #ffffff;
+			line-height: 1.8;
+			font-size: 1.05rem;
+		}
+
+		.step-content strong {
+			color: #ffffff;
+			font-weight: 700;
+		}
+
+		.step-content a {
+			color: #5eead4;
+			text-decoration: none;
+			font-weight: 700;
+			text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+		}
+
+		.step-content a:hover {
+			color: #7fffd4;
+			text-decoration: underline;
+		}
+
+		.step-content ul {
+			color: #ffffff;
+		}
+
+		.step-content ul li {
+			margin-bottom: 0.5rem;
+		}
+
+		.step-content p {
+			color: #ffffff;
+			margin-bottom: 1rem;
+		}
+
+		.step-content code {
+			background: rgba(56, 239, 125, 0.25);
+			color: #7fffd4;
+			padding: 0.3rem 0.6rem;
+			border-radius: 4px;
+			font-family: 'Courier New', monospace;
+			font-weight: 600;
+		}
+
+		.code-box {
+			background: #0f172a;
+			color: #ffffff;
+			padding: 1.5rem;
+			border-radius: 10px;
+			margin: 1rem 0;
+			font-family: 'Courier New', monospace;
+			font-size: 1rem;
+			border: 2px solid rgba(56, 239, 125, 0.4);
+			font-weight: 500;
+			line-height: 1.8;
+		}
+
+		/* Footer */
+		.footer {
+			position: relative;
+			background: rgba(255, 255, 255, 0.95);
+			padding: 2rem 0;
+			text-align: center;
+			color: #666;
+		}
+
+		.footer a {
+			color: #0d9488;
+			text-decoration: none;
+			font-weight: 600;
+		}
+
+		.footer a:hover {
+			text-decoration: underline;
+		}
+
+		/* Responsive */
+		@media (max-width: 992px) {
+			.hero-title {
+				font-size: 2.5rem;
+			}
+		}
+
+		@media (max-width: 768px) {
+			.hero-title {
+				font-size: 1.8rem;
+			}
+
+			.hero-subtitle {
+				font-size: 1.1rem;
+			}
+
+			.hero-content {
+				padding: 2rem;
+			}
+
+			.cta-title {
+				font-size: 2rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<!-- Vanta.js background -->
+	<div id="vanta-bg"></div>
+
+	<!-- Hero Section -->
+	<section class="hero-section">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-10">
+					<div class="hero-content text-center">
+						<h1 class="hero-title">
+							<i class="bi bi-code-slash"></i>Personal Tampermonkey Scripts
+						</h1>
+						<p class="hero-subtitle">
+							A curated collection of powerful browser enhancements for your daily web browsing.
+							Sort deals, convert currencies, enhance Reddit, manage listings, and more!
+						</p>
+						<div class="d-flex gap-3 justify-content-center flex-wrap">
+							<a href="#how-to-install" class="btn btn-primary-custom btn-lg">
+								<i class="bi bi-download me-2"></i>Get Started
+							</a>
+							<a href="#scripts" class="btn btn-outline-dark btn-lg px-4">
+								<i class="bi bi-list-ul me-2"></i>View Scripts
+							</a>
+							<a href="https://github.com/1110101/tampermonkey_personal_scripts" class="btn btn-success-custom btn-lg px-4" target="_blank">
+								<i class="bi bi-github me-2"></i>GitHub
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- What is Tampermonkey Section -->
+	<section class="feature-section">
+		<div class="container">
+			<div class="row text-center mb-5">
+				<div class="col-lg-10 mx-auto">
+					<h2 class="display-4 fw-bold mb-3 section-title-dark">What is Tampermonkey?</h2>
+					<p class="lead section-subtitle-dark">
+						Enhance your browsing experience with custom scripts
+					</p>
+				</div>
+			</div>
+
+			<div class="row g-4">
+				<div class="col-md-6 col-lg-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="bi bi-plugin"></i>
+						</div>
+						<h3 class="feature-title">Browser Extension</h3>
+						<p class="feature-text">
+							Tampermonkey is a free browser extension available for Chrome, Firefox, Safari, Edge, and Opera
+							that lets you run custom JavaScript code (UserScripts) on any website.
+						</p>
+					</div>
+				</div>
+
+				<div class="col-md-6 col-lg-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="bi bi-magic"></i>
+						</div>
+						<h3 class="feature-title">Customize Websites</h3>
+						<p class="feature-text">
+							UserScripts can modify webpage behavior, add new features, automate tasks,
+							improve UI/UX, and integrate with external APIs - all without changing the original website.
+						</p>
+					</div>
+				</div>
+
+				<div class="col-md-6 col-lg-4">
+					<div class="feature-card">
+						<div class="feature-icon">
+							<i class="bi bi-shield-check"></i>
+						</div>
+						<h3 class="feature-title">Safe & Controlled</h3>
+						<p class="feature-text">
+							Scripts run in a sandboxed environment with explicit permissions. You control which scripts
+							run on which sites. Scripts are stored locally and can be enabled/disabled anytime.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- How to Install Section -->
+	<section class="how-to-section" id="how-to-install">
+		<div class="container">
+			<div class="row text-center mb-5">
+				<div class="col-lg-10 mx-auto">
+					<h2 class="display-4 fw-bold mb-3 section-title-dark">How to Install & Use</h2>
+					<p class="lead section-subtitle-dark">
+						Get up and running in just a few minutes
+					</p>
+				</div>
+			</div>
+
+			<div class="row g-5">
+				<div class="col-lg-6">
+					<div class="step-number">1</div>
+					<h3 class="step-title">Install Tampermonkey Extension</h3>
+					<div class="step-content">
+						<p>First, install the Tampermonkey browser extension:</p>
+						<ul>
+							<li><strong>Chrome:</strong> <a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank">Chrome Web Store</a></li>
+							<li><strong>Firefox:</strong> <a href="https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/" target="_blank">Firefox Add-ons</a></li>
+							<li><strong>Edge:</strong> <a href="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd" target="_blank">Edge Add-ons</a></li>
+							<li><strong>Safari:</strong> <a href="https://apps.apple.com/app/tampermonkey/id1482490089" target="_blank">Mac App Store</a></li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-lg-6">
+					<div class="step-number">2</div>
+					<h3 class="step-title">Install UserScripts</h3>
+					<div class="step-content">
+						<p><strong>Easy Installation:</strong> Click the "Raw" button on any <code>.user.js</code> file on GitHub</p>
+						<div class="code-box">
+							1. Browse to <a href="https://github.com/1110101/tampermonkey_personal_scripts" target="_blank">GitHub Repository</a><br>
+							2. Click on a .user.js file<br>
+							3. Click the "Raw" button<br>
+							4. Tampermonkey will auto-detect it<br>
+							5. Click "Install"
+						</div>
+						<p class="mt-3"><em>Scripts with <code>@updateURL</code> will auto-update!</em></p>
+					</div>
+				</div>
+
+				<div class="col-lg-6">
+					<div class="step-number">3</div>
+					<h3 class="step-title">Enable & Configure</h3>
+					<div class="step-content">
+						<p>After installation:</p>
+						<ul>
+							<li>Scripts are <strong>enabled by default</strong> on matching websites</li>
+							<li>Click the Tampermonkey icon to see active scripts on current page</li>
+							<li>Toggle individual scripts on/off with the switch</li>
+							<li>Edit scripts anytime via Dashboard → click script name</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-lg-6">
+					<div class="step-number">4</div>
+					<h3 class="step-title">Auto-Updates</h3>
+					<div class="step-content">
+						<p>All scripts in this repo include auto-update URLs:</p>
+						<ul>
+							<li>Tampermonkey checks for updates periodically</li>
+							<li>Manual check: Dashboard → "Last updated" column</li>
+							<li>Updates require confirmation before installation</li>
+						</ul>
+						<p class="mt-3"><strong>No manual reinstallation needed!</strong></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Available Scripts Section -->
+	<section class="feature-section" id="scripts">
+		<div class="container">
+			<div class="row text-center mb-5">
+				<div class="col-lg-10 mx-auto">
+					<h2 class="display-4 fw-bold mb-3 section-title-dark">Available Scripts</h2>
+					<p class="lead section-subtitle-dark">
+						Browse the collection of useful UserScripts
+					</p>
+				</div>
+			</div>
+
+			<div class="row g-4">
+				<!-- CorporateBenefits Toolkit -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-sort-down me-2"></i>CorporateBenefits Toolkit
+						</h3>
+						<p class="script-description">
+							Sort and filter employee benefit offers by discount percentage. Fixes shop buttons to open directly without redirect overlays.
+						</p>
+						<ul class="script-features">
+							<li>Dynamic filter ranges based on actual discount distribution</li>
+							<li>3-state sort toggle (highest/lowest/off)</li>
+							<li>Shop buttons open directly in new tab</li>
+							<li>Works on both overview and offer pages</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">*.mitarbeiterangebote.de</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- MitarbeiterVorteile Toolkit -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-gift me-2"></i>MitarbeiterVorteile Toolkit
+						</h3>
+						<p class="script-description">
+							Sort and filter employee benefits portal offers by discount. Parses various discount formats including cashback and promotional text.
+						</p>
+						<ul class="script-features">
+							<li>Intelligent discount format parsing (%, cashback, text)</li>
+							<li>Automatic sorting from highest to lowest</li>
+							<li>Dynamic filter categories</li>
+							<li>Clean control panel interface</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">*.mitarbeitervorteile.de</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Kleinanzeigen Toolkit -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-collection me-2"></i>Kleinanzeigen Toolkit
+						</h3>
+						<p class="script-description">
+							Universal template and image manager for Kleinanzeigen.de. Save text templates and entire image groups for quick reuse.
+						</p>
+						<ul class="script-features">
+							<li>Text template manager with save/load/rename/delete</li>
+							<li>Image library with group organization</li>
+							<li>"Save all images" batch function</li>
+							<li>IndexedDB storage for images</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">kleinanzeigen.de</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- MyDealz Ignore Toolkit -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-eye-slash me-2"></i>MyDealz Ignore Toolkit
+						</h3>
+						<p class="script-description">
+							Ignore deals by keyword or manually. Track read deals with visual markers and hide them optionally.
+						</p>
+						<ul class="script-features">
+							<li>Keyword filtering with exact/partial match</li>
+							<li>Visual green markers for read articles</li>
+							<li>Manual ignore button on each deal</li>
+							<li>Toggle to hide/show seen articles</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">mydealz.de</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Reddit Highlight New Comments -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-chat-left-text me-2"></i>Reddit Highlight New Comments
+						</h3>
+						<p class="script-description">
+							Highlights new comments since your last visit. Quick action buttons for time navigation and adjustable highlight periods.
+						</p>
+						<ul class="script-features">
+							<li>Automatic visit tracking with 7-day history</li>
+							<li>Quick time buttons (5min, 30min, 1h, ½/¼ post age)</li>
+							<li>+/- buttons to adjust time (10min or 1h with Shift)</li>
+							<li>Color gradient based on comment age</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">reddit.com</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Złoty to Euro Converter -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-currency-exchange me-2"></i>Złoty to Euro Converter
+						</h3>
+						<p class="script-description">
+							Automatically converts Polish Złoty (PLN) to Euro on any webpage. Uses real-time exchange rates with caching.
+						</p>
+						<ul class="script-features">
+							<li>Real-time PLN → EUR conversion</li>
+							<li>4-hour rate caching to reduce API calls</li>
+							<li>Handles dynamic content (MutationObserver)</li>
+							<li>Works on any website with PLN prices</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">Any website</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Leaflet-OpenLayers-Zoomout -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<h3 class="script-title">
+							<i class="bi bi-zoom-out me-2"></i>Leaflet-OpenLayers-Zoomout
+						</h3>
+						<p class="script-description">
+							Double right-click to zoom out on Leaflet or OpenLayers maps. Simple but powerful map navigation enhancement.
+						</p>
+						<ul class="script-features">
+							<li>Double right-click zoom out gesture</li>
+							<li>Works with both Leaflet and OpenLayers</li>
+							<li>Auto-detects map instances</li>
+							<li>Prevents context menu interference</li>
+						</ul>
+						<div class="script-card-footer">
+							<span class="badge-website">Any map website</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- CTA Section -->
+	<section class="cta-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-10 mx-auto">
+					<div class="cta-box">
+						<h2 class="cta-title">Ready to Enhance Your Browser?</h2>
+						<p class="cta-text">
+							Install Tampermonkey and start using these powerful scripts today
+						</p>
+						<div class="d-flex gap-3 justify-content-center flex-wrap">
+							<a href="#how-to-install" class="btn btn-outline-custom btn-lg">
+								<i class="bi bi-book me-2"></i>Installation Guide
+							</a>
+							<a href="https://github.com/1110101/tampermonkey_personal_scripts" class="btn btn-light btn-lg px-4" target="_blank">
+								<i class="bi bi-github me-2"></i>View on GitHub
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="container">
+			<p class="mb-0">
+				<i class="bi bi-code-slash"></i> Personal Tampermonkey Scripts by <strong>1110101</strong> |
+				Built with Bootstrap 5 & Vanta.js | <a href="https://github.com/1110101/tampermonkey_personal_scripts">View on GitHub</a>
+			</p>
+			<p class="mb-0 mt-2">
+				<small>Licensed under MIT | All scripts include auto-update functionality</small>
+			</p>
+		</div>
+	</footer>
+
+	<!-- Three.js (required for Vanta.js) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+	<!-- Vanta.js WAVES Effect -->
+	<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.waves.min.js"></script>
+
+	<!-- Bootstrap 5 JS Bundle -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+	<!-- Initialize Vanta.js WAVES background -->
+	<script>
+		VANTA.WAVES({
+			el: '#vanta-bg',
+			mouseControls: true,
+			touchControls: true,
+			gyroControls: false,
+			minHeight: 200.00,
+			minWidth: 200.00,
+			scale: 1.00,
+			scaleMobile: 1.00,
+			color: 0x0a4a3a,
+			shininess: 30.00,
+			waveHeight: 15.00,
+			waveSpeed: 0.75,
+			zoom: 0.75
+		});
+	</script>
+</body>
+</html>
+

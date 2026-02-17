@@ -287,10 +287,11 @@
 		}
 
 		const arrSeenArticles = GM_getValue('seenArticles', []);
+		const bHideSeenArticles = GM_getValue('hideSeenArticles', false);
+
 		if (elNode.id && arrSeenArticles.includes(elNode.id)) {
-			// Check if we should hide seen articles
-			const bHideSeenArticles = GM_getValue('hideSeenArticles', false);
-			if (bHideSeenArticles) {
+			// Only hide if toggle is enabled AND article was already seen before page load
+			if (bHideSeenArticles && arrSeenArticlesOnLoad.has(elNode.id)) {
 				elNode.style.display = 'none';
 				return;
 			}
@@ -594,6 +595,9 @@
 	// Clean up old ignored articles (7 days)
 	cleanupOldIgnoredArticles();
 
+	// Store articles that were already seen at page load time (for hiding functionality)
+	const arrSeenArticlesOnLoad = new Set(GM_getValue('seenArticles', []));
+
 	// Initialize ignore list and apply styles
 	const objIgnoreList = GM_getValue('ignorelist', {});
 	const arrIgnoreList = Array.isArray(objIgnoreList) ? objIgnoreList : Object.keys(objIgnoreList);
@@ -787,7 +791,7 @@
 	// Hide seen articles if toggle is enabled (only previously seen ones)
 	const bHideSeenArticles = GM_getValue('hideSeenArticles', false);
 	if (bHideSeenArticles) {
-		arrVisibleArticles.forEach(strArticleId => {
+		arrSeenArticlesOnLoad.forEach(strArticleId => {
 			const elArticle = document.getElementById(strArticleId);
 			if (elArticle) {
 				elArticle.style.display = 'none';

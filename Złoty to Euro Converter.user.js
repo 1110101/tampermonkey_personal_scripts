@@ -50,7 +50,7 @@
 						reject('Failed to parse API response.');
 					}
 				},
-				onerror: (error) => reject('Failed to fetch exchange rate.', error),
+				onerror: (error) => reject(new Error(`Failed to fetch exchange rate: ${error}`)),
 				ontimeout: () => reject('The request timed out.')
 			});
 		});
@@ -88,20 +88,15 @@
 			observer.disconnect();
 		}
 
-		// Regex Explanation:
-		// ((\d{1,3}(?:,\d{3})*|\d+)(?:[.,]\d{1,2})?) - Captures numeric amount
-		// \s? - Optional space
-		// (zł|zl) - Currency symbol
-		// (?!\s*\([^)]*€\)) - Negative lookahead for existing conversions
 		const priceRegex = /((\d{1,3}(?:,\d{3})*|\d+)(?:[.,]\d{1,2})?)\s?(zł|zl)(?!\s*\([^)]*€\))/gi;
+		const priceTestRegex = /((\d{1,3}(?:,\d{3})*|\d+)(?:[.,]\d{1,2})?)\s?(zł|zl)(?!\s*\([^)]*€\))/i;
 
 		const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
 			acceptNode: (node) => {
 				if (node.parentElement.tagName.match(/^(script|style|textarea)$/i) ||
-					!priceRegex.test(node.nodeValue)) {
-					return NodeFilter.FILTER_REJECT;
+					!priceTestRegex.test(node.nodeValue)) {
+					return NodeFilter.FILTER_SKIP;
 				}
-				priceRegex.lastIndex = 0; // Reset regex state
 				return NodeFilter.FILTER_ACCEPT;
 			}
 		});

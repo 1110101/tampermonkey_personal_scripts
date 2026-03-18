@@ -35,12 +35,18 @@
 		}
 	};
 
+	// Sort button state definitions
+	const SORT_STATES = {
+		desc: { icon: '↓', label: 'Höchste zuerst', active: true },
+		asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
+		off: { icon: '—', label: 'Sortierung aus', active: false }
+	};
+
 	// Global state
 	const GLOBAL_STATE = {
 		sortState: 'desc', // 'desc', 'asc', 'off'
 		filterState: 'all', // 'all', 'high', 'medium', 'low'
 		filterRanges: null, // Will be calculated dynamically
-		originalOrder: new Map(), // Store original order of offers
 		initialized: false, // Track if initialization is complete
 		pauseObserver: null // Function to pause MutationObserver during sorting
 	};
@@ -280,7 +286,6 @@
 		offerCards.forEach((card, index) => {
 			if (!card.dataset.originalIndex) {
 				card.dataset.originalIndex = index;
-				GLOBAL_STATE.originalOrder.set(card, index);
 			}
 		});
 	}
@@ -445,15 +450,8 @@
 		const baseColor = '#007bff';
 		button.dataset.buttonType = 'sort';
 
-		// State icons and labels
-		const states = {
-			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
-			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false }
-		};
-
 		const updateButtonUI = () => {
-			const stateInfo = states[GLOBAL_STATE.sortState];
+			const stateInfo = SORT_STATES[GLOBAL_STATE.sortState];
 			button.textContent = `${stateInfo.icon} ${stateInfo.label}`;
 
 			if (stateInfo.active) {
@@ -498,7 +496,7 @@
 		});
 
 		button.addEventListener('mouseenter', () => {
-			if (!states[GLOBAL_STATE.sortState].active) {
+			if (!SORT_STATES[GLOBAL_STATE.sortState].active) {
 				button.style.background = baseColor;
 				button.style.color = 'white';
 			}
@@ -649,12 +647,7 @@
 	 */
 	function updateAllSortButtons() {
 		const allSortButtons = document.querySelectorAll('button[data-button-type="sort"]');
-		const states = {
-			desc: { icon: '↓', label: 'Höchste zuerst', active: true },
-			asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-			off: { icon: '—', label: 'Sortierung aus', active: false }
-		};
-		const stateInfo = states[GLOBAL_STATE.sortState];
+		const stateInfo = SORT_STATES[GLOBAL_STATE.sortState];
 		const baseColor = '#007bff';
 
 		allSortButtons.forEach(btn => {
@@ -690,13 +683,7 @@
 				// Update button label with dynamic ranges
 				if (ranges && btnFilterType && btnFilterType !== 'all') {
 					const [min, max] = ranges[btnFilterType];
-					if (btnFilterType === 'low') {
-						btn.textContent = `${Math.round(min)}-${Math.round(max)}%`;
-					} else if (btnFilterType === 'medium') {
-						btn.textContent = `${Math.round(min)}-${Math.round(max)}%`;
-					} else if (btnFilterType === 'high') {
-						btn.textContent = `${Math.round(min)}-${Math.round(max)}%`;
-					}
+					btn.textContent = `${Math.round(min)}-${Math.round(max)}%`;
 				}
 
 				btn.classList.toggle(CONFIG.classes.active, isActive);
@@ -961,19 +948,10 @@
 		setTimeout(() => {
 			initialize();
 		}, 500);
-
-		// Backup initialization after longer delay
-		setTimeout(() => {
-			initialize();
-		}, 2000);
 	}
 
 	// Start the script
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', waitForContent);
-	} else {
-		waitForContent();
-	}
+	waitForContent();
 
 })();
 

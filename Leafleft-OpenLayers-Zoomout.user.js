@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Zoomout with right click for Leafleft or OpenLayers
+// @name         Zoomout with right click for Leaflet or OpenLayers
 // @namespace    1110101
 // @version      1.5
-// @description  Zoomout with right click for Leafleft or OpenLayers
+// @description  Zoomout with right click for Leaflet or OpenLayers
 // @author       1110101@oczc.de
 // @match        *://*/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=leaflet.org
@@ -107,7 +107,6 @@
 		});
 	}
 
-	window.addEventListener('DOMContentLoaded', attachListeners);
-	setTimeout(attachListeners, 1000);
+	attachListeners();
 
 })();

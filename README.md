@@ -1,6 +1,8 @@
 # Personal Userscripts
 Various userscripts for enhancing web browsing experience on external sites.
 
+> ✨ Scripts and page developed with AI assistance (Claude).
+
 **🌐 [View Website](https://1110101.github.io/tampermonkey_personal_scripts/)**
 
 ## Scripts

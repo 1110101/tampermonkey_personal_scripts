@@ -91,7 +91,6 @@
 				document.querySelector('.user a')?.textContent :
 				null;
 
-			// Cache frequently used selectors
 			const authorSelector = '.author';
 			const taglineSelector = '.tagline';
 			const usertextSelector = '.usertext-body > .md';
@@ -224,7 +223,6 @@
 		custom_pos: 0,
 
 		create_comment_highlighter(visits) {
-		/* create element */
 			const highlighter = document.createElement('div');
 			highlighter.innerHTML = HNC.data.comment_highlighter;
 			highlighter.classList.add('rounded', 'gold-accent', 'comment-visits-box');
@@ -239,16 +237,13 @@
 			const comment_margin = window.getComputedStyle(firstComment).getPropertyValue('margin-left');
 			const gold_highlighter = document.querySelector('.comment-visits-box');
 
-			/* remove default comment highlighter */
 			if (gold_highlighter) {
 				gold_highlighter.remove();
 			}
 
-			/* properly place */
 			highlighter.style.setProperty('margin-left', comment_margin);
 			commentarea.insertBefore(highlighter, sitetable);
 
-			/* generate visits */
 			const select = document.getElementById('comment-visits');
 			for (const visit of visits) {
 				const option = document.createElement('option');
@@ -263,7 +258,6 @@
 				HNC.highlight(visits[1]);
 			}
 
-			/* add listeners */
 			select.addEventListener('change', this.update_highlighting);
 
 			const custom = document.getElementById('hnc_custom_visit');
@@ -271,18 +265,15 @@
 			custom.addEventListener('keydown', this.custom_visit_key_monitor);
 			custom.addEventListener('blur', this.set_custom_visit);
 
-			/* config button */
 			const config_button = document.getElementById('hnc_config_icon');
 			config_button.style.setProperty('background-image', HNC.data.config_icon.replace(/\s/g, ''));
 			config_button.addEventListener('click', this.show_config_dialog);
 
-			/* quick time buttons */
 			const quickTimeButtons = document.querySelectorAll('.hnc_quick_time');
 			for (const button of quickTimeButtons) {
 				button.addEventListener('click', this.quick_time_click);
 			}
 
-			/* adjust time buttons */
 			document.getElementById('hnc_time_add').addEventListener('click', this.adjust_time_click);
 			document.getElementById('hnc_time_subtract').addEventListener('click', this.adjust_time_click);
 		},
@@ -298,7 +289,6 @@
 				return;
 			}
 
-			// Calculate time difference
 			const diffMs = Date.now() - highlightTime;
 			const diffMinutes = Math.floor(diffMs / (60 * 1000));
 			const diffHours = Math.floor(diffMinutes / 60);
@@ -323,31 +313,26 @@
 			let highlightTime;
 
 			if (button.dataset.minutes) {
-			// Fixed time (5min, 30min, 1h)
 				const minutes = parseInt(button.dataset.minutes, 10);
 				highlightTime = Date.now() - minutes * 60 * 1000;
 			} else if (button.dataset.postRatio) {
-			// Dynamic time based on post age (½ age, ¼ age)
 				const postTime = HNC.ui.get_post_time();
 				if (!postTime) {
-					return; // Can't determine post age
+					return;
 				}
 				const postAge = Date.now() - postTime;
 				const ratio = parseFloat(button.dataset.postRatio);
 				highlightTime = Date.now() - (postAge * ratio);
 			}
 
-			// Store the current highlight time for +/- buttons
 			HNC.ui.currentHighlightTime = highlightTime;
 
-			// Reset highlighting and apply new time
 			HNC.reset_highlighting();
 			HNC.highlight(highlightTime);
 
-			// Update select to show it's a custom time
-			select.selectedIndex = 0; // "no highlighting" to indicate custom quick time
+			// Reset dropdown to "no highlighting" to indicate a quick-time override
+			select.selectedIndex = 0;
 
-			// Update time display
 			HNC.ui.update_time_display(highlightTime);
 		},
 
@@ -355,42 +340,35 @@
 			const isAdd = event.target.id === 'hnc_time_add';
 			const isShift = event.shiftKey;
 
-			// Determine adjustment: 10min normal, 1h with shift
+			// 10min normally, 1h with Shift
 			const adjustMinutes = isShift ? 60 : 10;
 			const adjustMs = adjustMinutes * 60 * 1000;
 
-			// If no current highlight time, start from now
 			if (!HNC.ui.currentHighlightTime) {
 				HNC.ui.currentHighlightTime = Date.now();
 			}
 
-			// Calculate new highlight time
-			// Adding means going further back in time (older comments)
-			// Subtracting means going forward in time (newer comments)
+			// "add" extends backward in time (shows older comments); "subtract" moves forward
 			let newHighlightTime;
 			if (isAdd) {
 				newHighlightTime = HNC.ui.currentHighlightTime - adjustMs;
 			} else {
 				newHighlightTime = HNC.ui.currentHighlightTime + adjustMs;
-				// Don't go into the future
 				if (newHighlightTime > Date.now()) {
 					newHighlightTime = Date.now();
 				}
 			}
 
-			// Store and apply
 			HNC.ui.currentHighlightTime = newHighlightTime;
 			HNC.reset_highlighting();
 			HNC.highlight(newHighlightTime);
 
-			// Update select and display
 			const select = document.getElementById('comment-visits');
 			select.selectedIndex = 0;
 			HNC.ui.update_time_display(newHighlightTime);
 		},
 
 		get_post_time() {
-		// Get the post submission time from the page
 			const linkThing = document.querySelector('.thing.link');
 			if (!linkThing) {
 				return null;
@@ -406,7 +384,6 @@
 		},
 
 		update_highlighting(event) {
-		/* no highlighting */
 			if (event.target.value === '') {
 				HNC.reset_highlighting();
 				HNC.ui.currentHighlightTime = null;
@@ -476,7 +453,6 @@
 				select.add(option, 2);
 				select.selectedIndex = 2;
 
-				// Store and manually trigger highlighting
 				HNC.ui.currentHighlightTime = customVisitTime;
 				HNC.reset_highlighting();
 				HNC.highlight(customVisitTime);
@@ -491,13 +467,11 @@
 		},
 
 		create_config_dialog() {
-		/* create wrapper */
 			const wrapper = document.createElement('div');
 			document.body.appendChild(wrapper);
 			wrapper.id = 'hnc_dialog_wrapper';
 			wrapper.innerHTML = HNC.data.config_dialog;
 
-			/* add preview */
 			const comment_preview = document.getElementById('hnc_comment_preview');
 			const first_comment = document.querySelector('.comment');
 			if (!first_comment) {
@@ -831,7 +805,6 @@
 				timeInput = timeInput.getTime();
 			} break;
 			case 'number':
-			// timeInput is already a number (timestamp), use it as-is
 				break;
 			default:
 				timeInput = +new Date();

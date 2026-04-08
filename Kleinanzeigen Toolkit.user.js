@@ -55,7 +55,6 @@
         .tm-dialog-button { margin-left: auto !important; margin-right: 10px !important; }
     `;
 
-	// Module for handling IndexedDB and GM storage
 	const Storage = {
 		getText: () => GM_getValue(CONFIG.TEMPLATES_KEY, {}),
 		setText: (templates) => GM_setValue(CONFIG.TEMPLATES_KEY, templates),
@@ -108,7 +107,6 @@
 		return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 	};
 
-	// Module for creating UI elements like toasts and modals
 	const UI = {
 		toast: (message) => {
 			const toast = document.createElement('div');
@@ -144,7 +142,6 @@
 		confirm: (title) => UI.modal(`<h3>${title}</h3><div class="gm-modal-buttons"><button id="gm-cancel-btn">Nein</button><button id="gm-confirm-btn" class="confirm">Ja</button></div>`)
 	};
 
-	// Module for interacting with the page's DOM
 	const DOM = {
 		setFieldValue: (el, val) => {
 			if (!el) {
@@ -166,10 +163,6 @@
 			fileInput: document.querySelector('#plupld input[type="file"]')
 		})
 	};
-
-	// =========================================================================
-	//  APP: The core logic of the script
-	// =========================================================================
 
 	const App = {
 		Text: {
@@ -385,12 +378,8 @@
 		}
 	};
 
-	// =========================================================================
-	//  INITIALIZATION
-	// =========================================================================
-
 	function main() {
-		// Guard clause: Prevents re-initialization if UI already exists.
+		// Prevents re-initialization if UI already exists
 		if (document.getElementById('tm-text-manager')) {
 			return;
 		}
@@ -398,7 +387,6 @@
 		const textAnchor = document.querySelector('legend.formlegend.headline-medium');
 		const imageAnchor = document.querySelector('#pstad-pictureupload');
 
-		// Only proceed if the page anchors are ready.
 		if (!textAnchor || !imageAnchor) {
 			return;
 		}
@@ -406,7 +394,6 @@
 		console.log('KA Manager: Initializing UI...');
 		GM_addStyle(STYLES);
 
-		// --- Text Manager UI ---
 		const textManagerNode = document.createElement('div');
 		textManagerNode.id = 'tm-text-manager';
 		textManagerNode.className = 'tm-manager';
@@ -430,22 +417,20 @@
 			}
 		});
 
-		// --- Image Manager UI ---
 		const imageManagerNode = document.createElement('div');
 		imageManagerNode.id = 'image-manager-container';
 		imageManagerNode.className = 'tm-manager';
 		imageAnchor.insertAdjacentElement('beforebegin', imageManagerNode);
 		imageManagerNode.addEventListener('click', e => App.Image.handleEvent(e));
 
-		// Initial render of content
 		App.Text.renderDropdown();
 		App.Image.render();
 	}
 
-	// This watcher survives "Turbo-Reloads" and re-initializes the UI if needed.
+	// Survives "Turbo-Reloads" and re-initializes the UI if needed
 	setInterval(main, 500);
 
-	// This separate watcher handles the image dialog injection.
+	// Handles image dialog injection
 	setInterval(() => {
 		const dialog = Array.from(document.querySelectorAll('dialog')).find(d => d.querySelector('#image-to-edit') && d.hasAttribute('open'));
 		if (dialog && !dialog.querySelector('.tm-dialog-button')) {

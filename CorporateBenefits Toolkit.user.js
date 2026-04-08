@@ -24,7 +24,6 @@
 		}
 	`);
 
-	// Configuration
 	const CONFIG = {
 		selectors: {
 			category: '.cbg3-category',
@@ -41,34 +40,30 @@
 		}
 	};
 
-	// Sort button state definitions
 	const SORT_STATES = {
-		desc: { icon: '↓', label: 'Höchste zuerst', active: true },
-		asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
-		off: { icon: '—', label: 'Sortierung aus', active: false }
+		desc: { icon: '↓', label: 'Highest first', active: true },
+		asc: { icon: '↑', label: 'Lowest first', active: true },
+		off: { icon: '—', label: 'Sort off', active: false }
 	};
 
-	// Global state for all categories
 	const GLOBAL_STATE = {
-		sortState: 'desc', // 'desc', 'asc', 'off'
-		filterState: 'all', // 'all', 'high', 'medium', 'low'
-		filterRanges: null // Will be calculated dynamically: { high: [min, max], medium: [min, max], low: [min, max] }
+		sortState: 'desc',
+		filterState: 'all',
+		filterRanges: null
 	};
 
 	/**
      * Parse discount text and return numeric value for sorting
-     * @param {string} discountText - The discount text like "< 25% Rabatt", "15% Rabatt", "> 7% Rabatt"
-     * @returns {number} - Numeric value for sorting (higher = better discount)
+     * @param {string} discountText - e.g. "< 25% Rabatt", "15% Rabatt", "> 7% Rabatt"
+     * @returns {number}
      */
 	function parseDiscountValue(discountText) {
 		if (!discountText) {
 			return 0;
 		}
 
-		// Remove "Rabatt" and clean up text
 		const text = discountText.replace(/\s*Rabatt\s*$/, '').trim();
 
-		// Handle different formats
 		const lessThanMatch = text.match(/^<\s*(\d+)%?$/);
 		if (lessThanMatch) {
 			return parseInt(lessThanMatch[1]);
@@ -84,7 +79,6 @@
 			return parseInt(exactMatch[1]);
 		}
 
-		// Handle ranges like "< 30%" - treat as the upper bound
 		const rangeMatch = text.match(/(\d+)%?/);
 		if (rangeMatch) {
 			return parseInt(rangeMatch[1]);
@@ -94,10 +88,9 @@
 	}
 
 	/**
-     * Get discount value from a list item element
-     * @param {HTMLElement} item - The list item element
-     * @returns {number} - The discount value
-     */
+	 * @param {HTMLElement} item
+	 * @returns {number}
+	 */
 	function getItemDiscountValue(item) {
 		const discountElement = item.querySelector(CONFIG.selectors.discountElement);
 		if (!discountElement) {
@@ -109,9 +102,8 @@
 	}
 
 	/**
-     * Sort items within a category by discount value
-     * @param {HTMLElement} category - The category container
-     * @param {boolean} ascending - Whether to sort ascending (default: false, descending)
+     * @param {HTMLElement} category
+     * @param {boolean} ascending
      */
 	function sortItemsByDiscount(category, ascending = false) {
 		const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
@@ -121,10 +113,8 @@
 
 		const items = Array.from(contentContainer.querySelectorAll(CONFIG.selectors.listItem));
 
-		// Filter out ad elements
 		const offerItems = items.filter(item => !item.classList.contains('cbg3-ad'));
 
-		// Sort by discount value
 		offerItems.sort((a, b) => {
 			const valueA = getItemDiscountValue(a);
 			const valueB = getItemDiscountValue(b);
@@ -136,16 +126,14 @@
 			}
 		});
 
-		// Re-append sorted items
 		offerItems.forEach(item => {
 			contentContainer.appendChild(item);
 		});
 	}
 
 	/**
-	 * Filter items by discount range
-	 * @param {HTMLElement} category - The category container
-	 * @param {string} filterType - The filter type ('all', 'high', 'medium', 'low')
+	 * @param {HTMLElement} category
+	 * @param {string} filterType - 'all', 'high', 'medium', 'low'
 	 */
 	function filterItemsByDiscount(category, filterType) {
 		const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
@@ -158,7 +146,6 @@
 
 		items.forEach(item => {
 			if (item.classList.contains('cbg3-ad')) {
-				// Always show ads
 				item.style.display = '';
 				return;
 			}
@@ -179,7 +166,7 @@
 
 	/**
 	 * Create control buttons for a category
-	 * @returns {HTMLElement} - The controls container
+	 * @returns {HTMLElement}
 	 */
 	function createControlButtons() {
 		const controlsContainer = document.createElement('div');
@@ -196,18 +183,17 @@
             align-items: center;
         `;
 
-		// Sort toggle button with 3 states (now global)
+		// Sort toggle button with 3 states (global — affects all categories at once)
 		const sortBtn = createSortToggleButton();
 
-		// Filter buttons
 		const filterLabel = document.createElement('span');
-		filterLabel.textContent = 'Filtern:';
+		filterLabel.textContent = 'Filter:';
 		filterLabel.style.fontWeight = 'bold';
 		filterLabel.style.marginLeft = '10px';
 		filterLabel.style.marginRight = '4px';
 		filterLabel.style.fontSize = '12px';
 
-		const filterAllBtn = createButton('Alle', () => {
+		const filterAllBtn = createButton('All', () => {
 			GLOBAL_STATE.filterState = 'all';
 			applyFilterToAllCategories();
 			updateAllFilterButtons('all');
@@ -216,11 +202,11 @@
 		filterAllBtn.style.background = '#28a745';
 		filterAllBtn.style.color = 'white';
 
-		// Create filter buttons with dynamic labels (will be updated after ranges are calculated)
+		// Create filter buttons with dynamic labels (updated after ranges are calculated)
 		const ranges = GLOBAL_STATE.filterRanges;
-		let lowLabel = 'Niedrig';
-		let mediumLabel = 'Mittel';
-		let highLabel = 'Hoch';
+		let lowLabel = 'Low';
+		let mediumLabel = 'Medium';
+		let highLabel = 'High';
 
 		if (ranges) {
 			lowLabel = `${Math.round(ranges.low[0])}-${Math.round(ranges.low[1])}%`;
@@ -257,8 +243,8 @@
 	}
 
 	/**
-	 * Create a sort toggle button with 3 states (now global)
-	 * @returns {HTMLElement} - The button element
+	 * Sort toggle button with 3 states, shared across all category toolbars.
+	 * @returns {HTMLElement}
 	 */
 	function createSortToggleButton() {
 		const button = document.createElement('button');
@@ -294,8 +280,7 @@
 			const currentState = GLOBAL_STATE.sortState;
 			let newState;
 
-			// Cycle through states: desc -> asc -> off -> desc
-			if (currentState === 'desc') {
+			// Cycle: desc -> asc -> off -> desc			if (currentState === 'desc') {
 				newState = 'asc';
 			} else if (currentState === 'asc') {
 				newState = 'off';
@@ -319,19 +304,17 @@
 			updateButtonUI();
 		});
 
-		// Initial UI
 		updateButtonUI();
 
 		return button;
 	}
 
 	/**
-	 * Create a button element
-	 * @param {string} text - Button text
-	 * @param {Function} onClick - Click handler
-	 * @param {string} buttonType - The button type ('sort' or 'filter')
-	 * @param {string} filterType - The filter type identifier ('all', 'high', 'medium', 'low')
-	 * @returns {HTMLElement} - The button element
+	 * @param {string} text
+	 * @param {Function} onClick
+	 * @param {string} buttonType - 'sort' or 'filter'
+	 * @param {string} filterType - 'all', 'high', 'medium', 'low'
+	 * @returns {HTMLElement}
 	 */
 	function createButton(text, onClick, buttonType, filterType = null) {
 		const button = document.createElement('button');
@@ -375,13 +358,12 @@
 
 
 	/**
-	 * Calculate dynamic filter ranges based on all discount values across all categories
-	 * @returns {Object} - Filter ranges { high: [min, max], medium: [min, max], low: [min, max] }
+	 * Calculate dynamic filter ranges based on all discount values across all categories.
+	 * @returns {{ high: [number, number], medium: [number, number], low: [number, number] }}
 	 */
 	function calculateFilterRanges() {
 		const allDiscounts = [];
 
-		// Collect all discount values from all categories
 		const categories = document.querySelectorAll('.cbg3-content');
 		categories.forEach(category => {
 			const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
@@ -402,7 +384,6 @@
 		});
 
 		if (allDiscounts.length === 0) {
-			// Fallback to fixed ranges if no discounts found
 			return {
 				high: [15, Infinity],
 				medium: [10, 15],
@@ -410,13 +391,12 @@
 			};
 		}
 
-		// Sort discounts to find percentiles
 		allDiscounts.sort((a, b) => a - b);
 
 		const [min] = allDiscounts;
 		const max = allDiscounts[allDiscounts.length - 1];
 
-		// Calculate tertiles (33rd and 66th percentile)
+		// Split into three equal bands (tertiles)
 		const tertile1Index = Math.floor(allDiscounts.length / 3);
 		const tertile2Index = Math.floor((allDiscounts.length * 2) / 3);
 
@@ -430,9 +410,6 @@
 		};
 	}
 
-	/**
-	 * Apply current global sort state to all categories
-	 */
 	function applySortToAllCategories() {
 		const categories = document.querySelectorAll('.cbg3-content');
 		categories.forEach(category => {
@@ -441,7 +418,7 @@
 			} else if (GLOBAL_STATE.sortState === 'asc') {
 				sortItemsByDiscount(category, true);
 			} else {
-				// Reset to original order
+				// Restore original DOM order using stored data-id
 				const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
 				if (contentContainer) {
 					const items = Array.from(contentContainer.querySelectorAll(CONFIG.selectors.listItem));
@@ -458,9 +435,6 @@
 		});
 	}
 
-	/**
-	 * Apply current global filter state to all categories
-	 */
 	function applyFilterToAllCategories() {
 		const categories = document.querySelectorAll('.cbg3-content');
 		categories.forEach(category => {
@@ -468,9 +442,6 @@
 		});
 	}
 
-	/**
-	 * Update all sort buttons UI to match global state
-	 */
 	function updateAllSortButtons() {
 		const allSortButtons = document.querySelectorAll('button[data-button-type="sort"]');
 		const stateInfo = SORT_STATES[GLOBAL_STATE.sortState];
@@ -491,7 +462,6 @@
 	}
 
 	/**
-	 * Update all filter buttons UI to match global state
 	 * @param {string} filterType - The active filter type
 	 */
 	function updateAllFilterButtons(filterType) {
@@ -506,7 +476,6 @@
 				const btnFilterType = btn.dataset.filterType;
 				const isActive = btnFilterType === filterType;
 
-				// Update button label with dynamic ranges
 				if (ranges && btnFilterType && btnFilterType !== 'all') {
 					const [min, max] = ranges[btnFilterType];
 					btn.textContent = `${Math.round(min)}-${Math.round(max)}%`;
@@ -526,14 +495,10 @@
 		});
 	}
 
-	/**
-	 * Initialize all categories on the page
-	 */
 	function initializeAllCategories() {
-		// Find all category containers
 		const categoryContainers = document.querySelectorAll('.cbg3-category--content');
 
-		// Calculate filter ranges first (only if not already calculated or if new categories were added)
+		// Recalculate filter ranges if not yet done or if new categories were added
 		const needsRecalculation = !GLOBAL_STATE.filterRanges ||
 			Array.from(categoryContainers).some(cc => {
 				const prevSibling = cc.previousElementSibling;
@@ -545,42 +510,32 @@
 		}
 
 		categoryContainers.forEach(contentContainer => {
-			// Check if this content container has items and doesn't have controls yet
 			const items = contentContainer.querySelectorAll(CONFIG.selectors.listItem);
 			if (items.length === 0) {
 				return;
 			}
 
-			// Check if controls already exist
 			if (contentContainer.previousElementSibling?.classList?.contains(CONFIG.classes.controlsContainer)) {
 				return;
 			}
 
-			// Find the category head (previous sibling or closest)
 			const categoryHead = contentContainer.previousElementSibling;
 			if (categoryHead && categoryHead.classList.contains('cbg3-category--head')) {
-				// Create and insert controls
 				const category = contentContainer.closest('.cbg3-content') || contentContainer.parentElement;
 				const controls = createControlButtons();
 				categoryHead.insertAdjacentElement('afterend', controls);
 
-				// Apply current global states to this new category
 				if (GLOBAL_STATE.sortState === 'desc') {
 					sortItemsByDiscount(category, false);
 				} else if (GLOBAL_STATE.sortState === 'asc') {
 					sortItemsByDiscount(category, true);
 				}
-				// Filter state
 				filterItemsByDiscount(category, GLOBAL_STATE.filterState);
 			}
 		});
 	}
 
-	/**
-	 * Wait for dynamic content and initialize controls
-	 */
 	function waitForContent() {
-		// Use MutationObserver to watch for changes
 		const observer = new MutationObserver((mutations) => {
 			let shouldReinitialize = false;
 
@@ -588,7 +543,6 @@
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach((node) => {
 						if (node.nodeType === Node.ELEMENT_NODE) {
-							// Check if category content was added
 							if (node.classList?.contains('cbg3-category--content') ||
 								node.querySelector?.('.cbg3-category--content')) {
 								shouldReinitialize = true;
@@ -598,7 +552,6 @@
 				}
 			});
 
-			// Reinitialize all categories if new content was detected
 			if (shouldReinitialize) {
 				setTimeout(() => {
 					initializeAllCategories();
@@ -606,13 +559,12 @@
 			}
 		});
 
-		// Start observing
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true
 		});
 
-		// Initial initialization with a small delay to ensure DOM is ready
+		// Small delay to ensure DOM is ready
 		setTimeout(() => {
 			initializeAllCategories();
 		}, 500);
@@ -622,8 +574,6 @@
 	 * Fix shop buttons on offer pages to link directly without redirect overlay
 	 */
 	function fixShopButtons() {
-		// Find all shop buttons (with shop icon) that have data-href attribute
-		// Exclude code-request buttons
 		const shopButtons = document.querySelectorAll('.cbg3-icon--shop button[data-href]:not(.cbg3-code-request)');
 
 		shopButtons.forEach(button => {
@@ -632,7 +582,6 @@
 				return;
 			}
 
-			// Remove the overlay-related attributes from parent
 			const parentDiv = button.closest('.cbg3-button--standard');
 			if (parentDiv) {
 				parentDiv.classList.remove('cbg3-overlay--open');
@@ -640,7 +589,6 @@
 				parentDiv.removeAttribute('data-overlay-id');
 			}
 
-			// Create a link element that looks like the original button
 			const link = document.createElement('a');
 			link.href = url;
 			link.target = '_blank';
@@ -648,16 +596,11 @@
 			link.className = button.className;
 			link.innerHTML = button.innerHTML;
 
-			// Replace the button with the link
 			button.replaceWith(link);
 		});
 	}
 
-	/**
-	 * Wait for shop buttons on offer pages
-	 */
 	function waitForShopButtons() {
-		// Use MutationObserver to watch for changes
 		const observer = new MutationObserver((mutations) => {
 			let shouldReinitialize = false;
 
@@ -665,7 +608,6 @@
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach((node) => {
 						if (node.nodeType === Node.ELEMENT_NODE) {
-							// Check if shop buttons were added
 							if (node.classList?.contains('cbg3-salesoption') ||
 								node.querySelector?.('.referrerShopButton')) {
 								shouldReinitialize = true;
@@ -675,7 +617,6 @@
 				}
 			});
 
-			// Reinitialize if new buttons were detected
 			if (shouldReinitialize) {
 				setTimeout(() => {
 					fixShopButtons();
@@ -683,19 +624,17 @@
 			}
 		});
 
-		// Start observing
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true
 		});
 
-		// Initial fix with a small delay to ensure DOM is ready
+		// Small delay to ensure DOM is ready
 		setTimeout(() => {
 			fixShopButtons();
 		}, 500);
 	}
 
-	// Start the script based on current page
 	const currentPath = window.location.pathname;
 
 	if (currentPath.includes('/overview/')) {

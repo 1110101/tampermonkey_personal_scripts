@@ -40,15 +40,13 @@
 
 	// mostly vibe coded, but it works
 
-	// ===== Function Definitions =====
-
 	function cleanupOldIgnoredArticles() {
 		const objIgnoreList = GM_getValue('ignorelist', {});
 		const iNow = Date.now();
 		const iSevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
 		let bCleaned = false;
 
-		// Handle old format (array) - convert to new format
+		// Handle old array format — convert to object with timestamps
 		if (Array.isArray(objIgnoreList)) {
 			const objNewIgnoreList = {};
 			objIgnoreList.forEach(id => {
@@ -82,7 +80,6 @@
 		// Trigger animation
 		setTimeout(() => elNotification.classList.add('gm-notification--show'), 10);
 
-		// Remove after 3 seconds
 		setTimeout(() => {
 			elNotification.classList.remove('gm-notification--show');
 			setTimeout(() => elNotification.remove(), 300);
@@ -96,7 +93,6 @@
 			return;
 		}
 
-		// Toggle button to hide/show seen articles
 		const elToggleSeenButton = document.createElement('button');
 		elToggleSeenButton.classList.add('button', 'button--shape-circle', 'button--type-secondary', 'button--mode-default', 'button--square');
 
@@ -104,7 +100,6 @@
 			const bIsHidden = GM_getValue('hideSeenArticles', false);
 			elToggleSeenButton.classList.toggle('button--selected', bIsHidden);
 			if (bIsHidden) {
-				// Eye with slash (hidden)
 				elToggleSeenButton.innerHTML = `
 	      <span title="Gelesene Artikel anzeigen" class="flex--inline boxAlign-ai--all-c">
 	          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -113,7 +108,6 @@
 	          </svg>
 	      </span>`;
 			} else {
-				// Normal eye (visible)
 				elToggleSeenButton.innerHTML = `
 	      <span title="Gelesene Artikel verstecken" class="flex--inline boxAlign-ai--all-c">
 	          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -166,7 +160,6 @@
 			e.stopPropagation();
 			e.preventDefault();
 
-			// Find the article element using closest()
 			const elArticleElement = elElement.closest('article[id^="thread_"]');
 			if (!elArticleElement) {
 				return;
@@ -177,10 +170,8 @@
 				return;
 			}
 
-			// Remove article from DOM
 			elArticleElement.remove();
 
-			// Add to ignore list with timestamp
 			const objCurrentIgnoreList = GM_getValue('ignorelist', {});
 			if (!objCurrentIgnoreList[strArticleId]) {
 				objCurrentIgnoreList[strArticleId] = Date.now();
@@ -202,7 +193,6 @@
 			return;
 		}
 
-		// Check if wrapper already exists
 		if (elTitleElement.parentElement.classList.contains('gm-title-wrapper')) {
 			return;
 		}
@@ -217,14 +207,11 @@
 			showTitleEditPrompt(elArticle);
 		});
 
-		// Create wrapper and move title into it
 		const elWrapper = document.createElement('div');
 		elWrapper.className = 'gm-title-wrapper';
 
-		// Insert wrapper before the title element
 		elTitleElement.parentElement.insertBefore(elWrapper, elTitleElement);
 
-		// Move title into wrapper and add button
 		elWrapper.appendChild(elTitleElement);
 		elWrapper.appendChild(elButton);
 	}
@@ -296,7 +283,6 @@
 				return;
 			}
 
-			// Otherwise just mark with green background
 			const elThreadListCard = elNode.querySelector('.threadListCard');
 			if (elThreadListCard) {
 				const elLeftBackground = document.createElement('div');
@@ -309,7 +295,6 @@
 
 	function processDOMNode(elNode, observerObserver) {
 		if (elNode.nodeType === Node.ELEMENT_NODE) {
-			// Handle new articles
 			if (elNode.tagName === 'ARTICLE') {
 				processNewArticle(elNode, observerObserver);
 				addTitleIgnoreButton(elNode);
@@ -432,7 +417,6 @@
 					exactMatch: elExactMatchCheckbox.checked
 				};
 
-				// Check if keyword already exists
 				const bExists = arrKeywords.some(k => {
 					const strKw = typeof k === 'string' ? k : k.keyword;
 					return strKw === strKeyword;
@@ -501,7 +485,6 @@
 					exactMatch: elExactMatchToggle.checked
 				};
 
-				// Check if keyword already exists
 				const bExists = arrKeywords.some(k => {
 					const strKw = typeof k === 'string' ? k : k.keyword;
 					return strKw === strKeyword;
@@ -570,18 +553,17 @@
 					}
 					GM_setValue('ignoreKeywords', arrUpdatedKeywords);
 					showNotification(`"${strKeyword}" ${elCheckbox.checked ? 'matched nur ganze Wörter' : 'matched Teilwörter'}`, 'info');
-					renderKeywords(); // Re-render to update badge
-					hideArticlesMatchingKeywords(); // Re-apply filters
+					renderKeywords();
+					hideArticlesMatchingKeywords();
 				});
 
-				// Delete keyword
 				elItem.querySelector('.gm-keyword-delete').addEventListener('click', () => {
 					const strDeletedKeyword = strKeyword;
 					const arrUpdatedKeywords = arrKeywords.filter((_, i) => i !== index);
 					GM_setValue('ignoreKeywords', arrUpdatedKeywords);
 					renderKeywords();
 					showNotification(`Keyword "${strDeletedKeyword}" gelöscht`, 'success');
-					hideArticlesMatchingKeywords(); // Re-apply filters
+					hideArticlesMatchingKeywords();
 				});
 				elList.appendChild(elItem);
 			});
@@ -592,13 +574,11 @@
 
 	// ===== Main Execution =====
 
-	// Clean up old ignored articles (7 days)
 	cleanupOldIgnoredArticles();
 
-	// Store articles that were already seen at page load time (for hiding functionality)
+	// Snapshot of seen articles at page load, used to decide which to hide on toggle
 	const arrSeenArticlesOnLoad = new Set(GM_getValue('seenArticles', []));
 
-	// Initialize ignore list and apply styles
 	const objIgnoreList = GM_getValue('ignorelist', {});
 	const arrIgnoreList = Array.isArray(objIgnoreList) ? objIgnoreList : Object.keys(objIgnoreList);
 	let strIgnoreString = `
@@ -771,7 +751,6 @@
 		});
 	});
 
-	// Start DOM observer
 	if (document.body) {
 		observerDOM.observe(document.body, { childList: true, subtree: true });
 	} else {
@@ -780,15 +759,13 @@
 		});
 	}
 
-	// Setup scroll handler
 	let bScrolled = false;
 	window.addEventListener('scroll', observeArticlesOnFirstScroll);
 
-	// Mark already seen articles on page load
 	const arrVisibleArticles = GM_getValue('seenArticles', []);
 	arrVisibleArticles.forEach(addSeenMarkerToArticle);
 
-	// Hide seen articles if toggle is enabled (only previously seen ones)
+	// Hide only articles that were already seen before this page load (respects toggle)
 	const bHideSeenArticles = GM_getValue('hideSeenArticles', false);
 	if (bHideSeenArticles) {
 		arrSeenArticlesOnLoad.forEach(strArticleId => {
@@ -799,10 +776,8 @@
 		});
 	}
 
-	// Hide articles by keywords on page load
 	hideArticlesMatchingKeywords();
 
-	// Add ignore buttons to existing articles
 	document.querySelectorAll('article').forEach(elArticle => {
 		addTitleIgnoreButton(elArticle);
 	});

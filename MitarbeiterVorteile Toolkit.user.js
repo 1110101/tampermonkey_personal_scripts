@@ -16,7 +16,6 @@
 (function () {
 	'use strict';
 
-	// Configuration
 	const CONFIG = {
 		selectors: {
 			offerCard: '.offer-card',
@@ -35,29 +34,23 @@
 		}
 	};
 
-	// Sort button state definitions
 	const SORT_STATES = {
 		desc: { icon: '↓', label: 'Höchste zuerst', active: true },
 		asc: { icon: '↑', label: 'Niedrigste zuerst', active: true },
 		off: { icon: '—', label: 'Sortierung aus', active: false }
 	};
 
-	// Global state
 	const GLOBAL_STATE = {
-		sortState: 'desc', // 'desc', 'asc', 'off'
-		filterState: 'all', // 'all', 'high', 'medium', 'low'
-		filterRanges: null, // Will be calculated dynamically
-		initialized: false, // Track if initialization is complete
-		pauseObserver: null // Function to pause MutationObserver during sorting
+		sortState: 'desc',
+		filterState: 'all',
+		filterRanges: null,
+		initialized: false,
+		pauseObserver: null // Temporarily disconnects the MutationObserver during DOM reordering to prevent feedback loops
 	};
 
-	// Session storage key for state persistence
 	const STATE_STORAGE_KEY = 'discountSorter_state';
-	const STATE_MAX_AGE = 5 * 60 * 1000; // 5 minutes in milliseconds
+	const STATE_MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
-	/**
-	 * Save current state to sessionStorage
-	 */
 	function saveState() {
 		try {
 			const currentPage = getCurrentPage();
@@ -77,8 +70,7 @@
 	}
 
 	/**
-	 * Load state from sessionStorage
-	 * @returns {Object|null} - Saved state or null if not found/expired
+	 * @returns {Object|null} Saved state, or null if not found/expired
 	 */
 	function loadState() {
 		try {
@@ -88,14 +80,12 @@
 
 			const state = JSON.parse(stored);
 
-			// Check if state is too old
 			const age = Date.now() - state.timestamp;
 			if (age > STATE_MAX_AGE) {
 				sessionStorage.removeItem(STATE_STORAGE_KEY);
 				return null;
 			}
 
-			// Check if we're on the same URL
 			const currentUrl = window.location.pathname + window.location.search;
 			if (state.url !== currentUrl) {
 				return null;
@@ -108,8 +98,7 @@
 	}
 
 	/**
-	 * Get current native sort selection
-	 * @returns {string|null} - Current sort value (RANK, DATE, RATING, DISCOUNT)
+	 * @returns {string|null} Current sort value (RANK, DATE, RATING, DISCOUNT)
 	 */
 	function getNativeSortValue() {
 		const sortContainer = document.querySelector('.sort.advanced-filter');
@@ -120,17 +109,16 @@
 	}
 
 	/**
-	 * Activate native "Rabatt" (discount) sorting if not already active
-	 * @param {boolean} force - Force activation even if another sort is active
+	 * Activate native "Rabatt" (discount) sort if not already active.
+	 * Only auto-activates from the default RANK sort unless force=true.
+	 * @param {boolean} force
 	 */
 	function activateNativeDiscountSort(force = false) {
-		// Find the sort dropdown
 		const sortContainer = document.querySelector('.sort.advanced-filter');
 		if (!sortContainer) {
 			return false;
 		}
 
-		// Check if "Rabatt" is already active
 		const activeOption = sortContainer.querySelector('.options.active');
 		const currentSort = activeOption?.getAttribute('data-value');
 		const isDiscountActive = currentSort === 'DISCOUNT';
@@ -139,12 +127,11 @@
 			return true;
 		}
 
-		// Only activate if forced or if we're on default (RANK)
+		// Only activate if forced or if we're on the default (RANK)
 		if (!force && currentSort !== 'RANK') {
 			return false;
 		}
 
-		// Find and click the "Rabatt" option
 		const discountOption = sortContainer.querySelector('.options[data-value="DISCOUNT"]');
 		if (discountOption) {
 			discountOption.click();
@@ -155,8 +142,7 @@
 	}
 
 	/**
-	 * Get current page number from pagination
-	 * @returns {number} - Current page (0-indexed)
+	 * @returns {number} Current page, 0-indexed
 	 */
 	function getCurrentPage() {
 		const activePage = document.querySelector('.pagination .page-item.active');
@@ -166,23 +152,20 @@
 
 		const text = activePage.textContent.trim();
 		const pageNumber = parseInt(text);
-		const result = isNaN(pageNumber) ? 0 : pageNumber - 1; // Convert to 0-indexed
-		return result;
+		return isNaN(pageNumber) ? 0 : pageNumber - 1;
 	}
 
 	/**
-	 * Navigate to a specific page
-	 * @param {number} pageIndex - Page index (0-indexed)
+	 * @param {number} pageIndex - 0-indexed
 	 */
 	function goToPage(pageIndex) {
 		if (pageIndex === 0) {
-			// Page 1 might not have a data-page attribute, check for active
 			const currentPage = getCurrentPage();
 			if (currentPage === 0) {
-				return; // Already on page 1
+				return;
 			}
 
-			// Find the link for page 1 (might have data-page="0" or no data-page)
+			// Page 1 may not have a data-page attribute
 			const page1Link = document.querySelector('.pagination a[aria-label*="Gehe zu 1 Seite"]');
 			if (page1Link) {
 				page1Link.click();
@@ -190,9 +173,7 @@
 			}
 		}
 
-		// For other pages, look for data-page attribute
-		// data-page="0" = page 1, data-page="1" = page 2, etc.
-		// So if pageIndex=2 (we want page 3), we need data-page="2"
+		// data-page is 0-indexed: data-page="0" = page 1, data-page="1" = page 2, etc.
 		const pageLink = document.querySelector(`.pagination a[data-page="${pageIndex}"]`);
 		if (pageLink) {
 			pageLink.click();
@@ -200,51 +181,48 @@
 	}
 
 	/**
-	 * Parse discount text and return numeric value for sorting
-	 * @param {string} discountText - The discount text like "-10 %", "10% Cashback", "-4,5 %"
-	 * @returns {number} - Numeric value for sorting (higher = better discount)
+	 * Parse discount text and return numeric value for sorting.
+	 * @param {string} discountText - e.g. "-10 %", "10% Cashback", "-4,5 %"
+	 * @returns {number}
 	 */
 	function parseDiscountValue(discountText) {
 		if (!discountText) {return 0;}
 
-		// Clean up text
 		const text = discountText.trim();
 
-		// Handle cashback format: "10% Cashback"
+		// "10% Cashback"
 		const cashbackMatch = text.match(/(\d+[.,]?\d*)\s*%?\s*[Cc]ashback/);
 		if (cashbackMatch) {
 			const value = cashbackMatch[1].replace(',', '.');
 			return parseFloat(value);
 		}
 
-		// Handle standard discount format: "-10 %", "-4,5 %"
+		// "-10 %", "-4,5 %"
 		const standardMatch = text.match(/-?\s*(\d+[.,]?\d*)\s*%/);
 		if (standardMatch) {
 			const value = standardMatch[1].replace(',', '.');
 			return parseFloat(value);
 		}
 
-		// Try to extract any percentage from complex strings
-		// e.g., "Zalando 50€ + 15% Sports Coupon on top"
+		// e.g. "Zalando 50€ + 15% Sports Coupon on top"
 		const percentMatch = text.match(/(\d+[.,]?\d*)\s*%/);
 		if (percentMatch) {
 			const value = percentMatch[1].replace(',', '.');
 			return parseFloat(value);
 		}
 
-		// Handle "< 25%" or "> 7%" format
+		// "< 25%" or "> 7%"
 		const comparisonMatch = text.match(/[<>]\s*(\d+[.,]?\d*)\s*%/);
 		if (comparisonMatch) {
 			const value = comparisonMatch[1].replace(',', '.');
 			return parseFloat(value);
 		}
 
-		// Try to extract any number as last resort
 		const numberMatch = text.match(/(\d+[.,]?\d*)/);
 		if (numberMatch) {
 			const value = numberMatch[1].replace(',', '.');
 			const parsed = parseFloat(value);
-			// If the number is very large, it's probably not a discount percentage
+			// Reject implausibly large numbers that aren't a discount percentage
 			return parsed <= 100 ? parsed : 0;
 		}
 
@@ -252,23 +230,19 @@
 	}
 
 	/**
-	 * Get discount value from an offer card element
-	 * @param {HTMLElement} offerCard - The offer-card element
-	 * @returns {number} - The discount value
+	 * @param {HTMLElement} offerCard
+	 * @returns {number}
 	 */
 	function getOfferDiscountValue(offerCard) {
-		// Find the offer-details inside the card
 		const offerDetails = offerCard.querySelector(CONFIG.selectors.offerDetails);
 		if (!offerDetails) {return 0;}
 
-		// Try to find discount in .title .box .text first
 		const discountBox = offerDetails.querySelector(CONFIG.selectors.discountBox);
 		if (discountBox) {
 			const discountText = discountBox.textContent.trim();
 			return parseDiscountValue(discountText);
 		}
 
-		// Fall back to .title element
 		const titleElement = offerDetails.querySelector(CONFIG.selectors.discountTitle);
 		if (titleElement) {
 			const discountText = titleElement.textContent.trim();
@@ -278,9 +252,6 @@
 		return 0;
 	}
 
-	/**
-	 * Store original order of offer cards
-	 */
 	function storeOriginalOrder() {
 		const offerCards = document.querySelectorAll(CONFIG.selectors.offerCard);
 		offerCards.forEach((card, index) => {
@@ -291,18 +262,15 @@
 	}
 
 	/**
-	 * Sort all offer cards by discount value
-	 * @param {boolean} ascending - Whether to sort ascending (default: false, descending)
+	 * @param {boolean} ascending
 	 */
 	function sortOffersByDiscount(ascending = false) {
 		const offerCards = Array.from(document.querySelectorAll(CONFIG.selectors.offerCard));
 		if (offerCards.length === 0) {return;}
 
-		// Get the parent container (offer-list)
 		const offerList = document.querySelector(CONFIG.selectors.offerList);
 		if (!offerList) {return;}
 
-		// Sort by discount value
 		offerCards.sort((a, b) => {
 			const valueA = getOfferDiscountValue(a);
 			const valueB = getOfferDiscountValue(b);
@@ -314,15 +282,11 @@
 			}
 		});
 
-		// Re-append sorted offer cards to the list
 		offerCards.forEach(card => {
 			offerList.appendChild(card);
 		});
 	}
 
-	/**
-	 * Restore original order of offer cards
-	 */
 	function restoreOriginalOrder() {
 		const offerCards = Array.from(document.querySelectorAll(CONFIG.selectors.offerCard));
 		if (offerCards.length === 0) {return;}
@@ -330,22 +294,19 @@
 		const offerList = document.querySelector(CONFIG.selectors.offerList);
 		if (!offerList) {return;}
 
-		// Sort by original index
 		offerCards.sort((a, b) => {
 			const indexA = parseInt(a.dataset.originalIndex) || 0;
 			const indexB = parseInt(b.dataset.originalIndex) || 0;
 			return indexA - indexB;
 		});
 
-		// Re-append in original order
 		offerCards.forEach(card => {
 			offerList.appendChild(card);
 		});
 	}
 
 	/**
-	 * Filter offer cards by discount range
-	 * @param {string} filterType - The filter type ('all', 'high', 'medium', 'low')
+	 * @param {string} filterType - 'all', 'high', 'medium', 'low'
 	 */
 	function filterOffersByDiscount(filterType) {
 		const offerCards = document.querySelectorAll(CONFIG.selectors.offerCard);
@@ -362,14 +323,12 @@
 				show = discountValue >= min && discountValue <= max;
 			}
 
-			// Hide or show the entire offer card
 			card.style.display = show ? '' : 'none';
 		});
 	}
 
 	/**
-	 * Calculate dynamic filter ranges based on all discount values
-	 * @returns {Object} - Filter ranges { high: [min, max], medium: [min, max], low: [min, max] }
+	 * @returns {{ high: [number, number], medium: [number, number], low: [number, number] }}
 	 */
 	function calculateFilterRanges() {
 		const allDiscounts = [];
@@ -383,7 +342,6 @@
 		});
 
 		if (allDiscounts.length === 0) {
-			// Fallback to fixed ranges if no discounts found
 			return {
 				high: [15, Infinity],
 				medium: [10, 15],
@@ -391,13 +349,12 @@
 			};
 		}
 
-		// Sort discounts to find percentiles
 		allDiscounts.sort((a, b) => a - b);
 
 		const [min] = allDiscounts;
 		const max = allDiscounts[allDiscounts.length - 1];
 
-		// Calculate tertiles (33rd and 66th percentile)
+		// Split into three equal bands (tertiles)
 		const tertile1Index = Math.floor(allDiscounts.length / 3);
 		const tertile2Index = Math.floor((allDiscounts.length * 2) / 3);
 
@@ -411,11 +368,7 @@
 		};
 	}
 
-	/**
-	 * Apply current global sort state
-	 */
 	function applySortState() {
-		// Pause observer during sorting
 		if (GLOBAL_STATE.pauseObserver) {
 			GLOBAL_STATE.pauseObserver();
 		}
@@ -429,11 +382,7 @@
 		}
 	}
 
-	/**
-	 * Apply current global filter state
-	 */
 	function applyFilterState() {
-		// Pause observer during filtering
 		if (GLOBAL_STATE.pauseObserver) {
 			GLOBAL_STATE.pauseObserver();
 		}
@@ -442,8 +391,8 @@
 	}
 
 	/**
-	 * Create a sort toggle button with 3 states
-	 * @returns {HTMLElement} - The button element
+	 * Sort toggle button with 3 states.
+	 * @returns {HTMLElement}
 	 */
 	function createSortToggleButton() {
 		const button = document.createElement('button');
@@ -480,7 +429,7 @@
 			const currentState = GLOBAL_STATE.sortState;
 			let newState;
 
-			// Cycle through states: desc -> asc -> off -> desc
+			// Cycle: desc -> asc -> off -> desc
 			if (currentState === 'desc') {
 				newState = 'asc';
 			} else if (currentState === 'asc') {
@@ -492,7 +441,7 @@
 			GLOBAL_STATE.sortState = newState;
 			applySortState();
 			updateAllSortButtons();
-			saveState(); // Save state after sorting
+			saveState();
 		});
 
 		button.addEventListener('mouseenter', () => {
@@ -506,18 +455,16 @@
 			updateButtonUI();
 		});
 
-		// Initial UI
 		updateButtonUI();
 
 		return button;
 	}
 
 	/**
-	 * Create a filter button
-	 * @param {string} text - Button text
-	 * @param {Function} onClick - Click handler
-	 * @param {string} filterType - The filter type identifier ('all', 'high', 'medium', 'low')
-	 * @returns {HTMLElement} - The button element
+	 * @param {string} text
+	 * @param {Function} onClick
+	 * @param {string} filterType - 'all', 'high', 'medium', 'low'
+	 * @returns {HTMLElement}
 	 */
 	function createFilterButton(text, onClick, filterType) {
 		const button = document.createElement('button');
@@ -559,8 +506,7 @@
 	}
 
 	/**
-	 * Create control buttons
-	 * @returns {HTMLElement} - The controls container
+	 * @returns {HTMLElement}
 	 */
 	function createControlButtons() {
 		const controlsContainer = document.createElement('div');
@@ -578,10 +524,8 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         `;
 
-		// Sort toggle button
 		const sortBtn = createSortToggleButton();
 
-		// Filter label
 		const filterLabel = document.createElement('span');
 		filterLabel.textContent = 'Filtern:';
 		filterLabel.style.fontWeight = 'bold';
@@ -589,7 +533,6 @@
 		filterLabel.style.marginRight = '4px';
 		filterLabel.style.fontSize = '13px';
 
-		// Get dynamic labels
 		const ranges = GLOBAL_STATE.filterRanges;
 		let lowLabel = 'Niedrig';
 		let mediumLabel = 'Mittel';
@@ -605,7 +548,7 @@
 			GLOBAL_STATE.filterState = 'all';
 			applyFilterState();
 			updateAllFilterButtons('all');
-			saveState(); // Save state after filtering
+			saveState();
 		}, 'all');
 		filterAllBtn.classList.add(CONFIG.classes.active);
 		filterAllBtn.style.background = '#28a745';
@@ -615,21 +558,21 @@
 			GLOBAL_STATE.filterState = 'low';
 			applyFilterState();
 			updateAllFilterButtons('low');
-			saveState(); // Save state after filtering
+			saveState();
 		}, 'low');
 
 		const filterMediumBtn = createFilterButton(mediumLabel, () => {
 			GLOBAL_STATE.filterState = 'medium';
 			applyFilterState();
 			updateAllFilterButtons('medium');
-			saveState(); // Save state after filtering
+			saveState();
 		}, 'medium');
 
 		const filterHighBtn = createFilterButton(highLabel, () => {
 			GLOBAL_STATE.filterState = 'high';
 			applyFilterState();
 			updateAllFilterButtons('high');
-			saveState(); // Save state after filtering
+			saveState();
 		}, 'high');
 
 		controlsContainer.appendChild(sortBtn);
@@ -642,9 +585,6 @@
 		return controlsContainer;
 	}
 
-	/**
-	 * Update all sort buttons UI to match global state
-	 */
 	function updateAllSortButtons() {
 		const allSortButtons = document.querySelectorAll('button[data-button-type="sort"]');
 		const stateInfo = SORT_STATES[GLOBAL_STATE.sortState];
@@ -665,7 +605,6 @@
 	}
 
 	/**
-	 * Update all filter buttons UI to match global state
 	 * @param {string} filterType - The active filter type
 	 */
 	function updateAllFilterButtons(filterType) {
@@ -680,7 +619,6 @@
 				const btnFilterType = btn.dataset.filterType;
 				const isActive = btnFilterType === filterType;
 
-				// Update button label with dynamic ranges
 				if (ranges && btnFilterType && btnFilterType !== 'all') {
 					const [min, max] = ranges[btnFilterType];
 					btn.textContent = `${Math.round(min)}-${Math.round(max)}%`;
@@ -700,9 +638,6 @@
 		});
 	}
 
-	/**
-	 * Add listeners to pagination links to save state AFTER navigation
-	 */
 	function addPaginationListeners() {
 		const paginationLinks = document.querySelectorAll('.pagination a');
 		paginationLinks.forEach(link => {
@@ -710,7 +645,7 @@
 			link.dataset.paginationListener = 'true';
 
 			link.addEventListener('click', () => {
-				// Save state after a short delay to let the page change
+				// Short delay to let the page change before saving
 				setTimeout(() => {
 					saveState();
 				}, 500);
@@ -719,28 +654,24 @@
 	}
 
 	/**
-	 * Convert "Online" buttons to links for native browser link behavior
+	 * Replace "Online" action buttons with real <a> links so middle-click and Ctrl+Click work.
 	 */
 	function makeOfferCardsMiddleClickable() {
 		const offerCards = document.querySelectorAll(CONFIG.selectors.offerCard);
 
 		offerCards.forEach(card => {
-			// Skip if already processed
 			if (card.dataset.middleClickEnabled) {return;}
 			card.dataset.middleClickEnabled = 'true';
 
 			const url = card.getAttribute('data-url');
 			if (!url) {return;}
 
-			// Find the "Online" button (or similar action button)
 			const onlineButton = card.querySelector('button.stamp-online, button.button-default');
 			if (!onlineButton) {return;}
 
-			// Get button properties before replacing
 			const buttonText = onlineButton.textContent;
 			const buttonClasses = onlineButton.className;
 
-			// Create a link that looks like the button
 			const link = document.createElement('a');
 			link.href = url;
 			link.textContent = buttonText;
@@ -751,103 +682,80 @@
 				cursor: pointer;
 			`;
 
-			// Copy relevant attributes
 			if (onlineButton.hasAttribute('aria-label')) {
 				link.setAttribute('aria-label', onlineButton.getAttribute('aria-label'));
 			}
 
-			// Save state when link is clicked (before navigation)
 			link.addEventListener('click', () => {
 				saveState();
 			});
 
-			// Also save state on middle-click and Ctrl+Click
+			// Save state on middle-click and Ctrl+Click so it survives navigation
 			link.addEventListener('mousedown', (e) => {
 				if (e.button === 1 || (e.button === 0 && (e.ctrlKey || e.metaKey))) {
 					saveState();
 				}
 			});
 
-			// Replace button with link
 			onlineButton.parentNode.replaceChild(link, onlineButton);
 		});
 	}
 
-	/**
-	 * Initialize the controls
-	 */
 	function initialize() {
-		// Prevent multiple initializations
 		if (GLOBAL_STATE.initialized) {
 			return;
 		}
 
-		// Check if offer cards exist
 		const offerCards = document.querySelectorAll(CONFIG.selectors.offerCard);
 		if (offerCards.length === 0) {
 			return;
 		}
 
-		// Check if controls already exist
 		const controlsExist = document.querySelector(`.${CONFIG.classes.controlsContainer}`);
 
-		// Get the offer list container
 		const offerList = document.querySelector(CONFIG.selectors.offerList);
 		if (!offerList) {
 			return;
 		}
 
-		// Try to restore saved state
 		const savedState = loadState();
 
 		if (savedState) {
-			// Restore state values
 			GLOBAL_STATE.sortState = savedState.sortState;
 			GLOBAL_STATE.filterState = savedState.filterState;
 
-			// Restore native sort if it was saved
 			if (savedState.nativeSortValue === 'DISCOUNT') {
 				setTimeout(() => {
-					activateNativeDiscountSort(true); // Force it since it was saved
+					activateNativeDiscountSort(true);
 				}, 300);
 			}
 		} else {
-			// No saved state - activate discount sort only if still on default (RANK)
-			activateNativeDiscountSort(false); // Don't force
+			activateNativeDiscountSort(false);
 		}
 
-		// Store original order if not already stored
 		if (!controlsExist) {
 			storeOriginalOrder();
 		}
 
-		// Calculate filter ranges
 		GLOBAL_STATE.filterRanges = calculateFilterRanges();
 
-		// Create controls if they don't exist
 		if (!controlsExist) {
 			const controls = createControlButtons();
 			offerList.parentElement.insertBefore(controls, offerList);
 		}
 
-		// Apply sort and filter (either restored state or default)
 		applySortState();
 		applyFilterState();
 
-		// Update button UI to reflect current state
 		updateAllSortButtons();
 		updateAllFilterButtons(GLOBAL_STATE.filterState);
 
-		// Make offer cards middle-clickable
 		makeOfferCardsMiddleClickable();
-
-		// Add listeners to pagination links to save state
 		addPaginationListeners();
 
-		// Mark as initialized
 		GLOBAL_STATE.initialized = true;
 
-		// Navigate to saved page if needed (after a delay to let page settle)
+		// Navigate to saved page after a short delay to let the page settle
 		if (savedState && savedState.currentPage > 0) {
 			setTimeout(() => {
 				const currentPage = getCurrentPage();
@@ -858,13 +766,10 @@
 		}
 	}
 
-	/**
-	 * Wait for content and initialize
-	 */
 	function waitForContent() {
 		let observer = null;
 
-		// Store reference to observer for temporary disconnect
+		// Temporarily disconnects the observer during DOM reordering to prevent feedback loops
 		GLOBAL_STATE.pauseObserver = () => {
 			if (observer) {
 				observer.disconnect();
@@ -879,7 +784,6 @@
 			}
 		};
 
-		// Use MutationObserver to watch for changes
 		observer = new MutationObserver((mutations) => {
 			let hasNewOfferCards = false;
 			let hasReallyNewCards = false;
@@ -888,10 +792,9 @@
 				if (mutation.type === 'childList') {
 					mutation.addedNodes.forEach((node) => {
 						if (node.nodeType === Node.ELEMENT_NODE) {
-							// Check if this is an offer-card
 							if (node.classList?.contains('offer-card')) {
 								hasNewOfferCards = true;
-								// Check if it's really new (no originalIndex yet)
+								// Distinguish freshly-added cards from re-sorted ones
 								if (!node.dataset.originalIndex && !node.dataset.middleClickEnabled) {
 									hasReallyNewCards = true;
 								}
@@ -909,15 +812,12 @@
 				}
 			});
 
-			// If we haven't initialized yet and found offer cards, initialize
 			if (hasNewOfferCards && !GLOBAL_STATE.initialized) {
 				setTimeout(() => {
 					initialize();
 				}, 100);
 			} else if (hasReallyNewCards && GLOBAL_STATE.initialized) {
-				// Only if we found REALLY new cards (not just re-sorted)
 				setTimeout(() => {
-					// Store original order for new cards
 					const newCards = document.querySelectorAll(CONFIG.selectors.offerCard);
 					newCards.forEach((card, index) => {
 						if (!card.dataset.originalIndex) {
@@ -925,32 +825,26 @@
 						}
 					});
 
-					// Re-apply current sort and filter (will pause observer automatically)
 					applySortState();
 					applyFilterState();
 
-					// Make new cards clickable
 					makeOfferCardsMiddleClickable();
-
-					// Update pagination listeners
 					addPaginationListeners();
 				}, 100);
 			}
 		});
 
-		// Start observing
 		observer.observe(document.body, {
 			childList: true,
 			subtree: true
 		});
 
-		// Initial initialization with a small delay to ensure DOM is ready
+		// Small delay to ensure DOM is ready
 		setTimeout(() => {
 			initialize();
 		}, 500);
 	}
 
-	// Start the script
 	waitForContent();
 
 })();

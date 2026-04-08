@@ -21,7 +21,7 @@
 	'use strict';
 
 
-	// First, perform a quick check to see if the currency symbol exists. If not, exit early to save resources.
+	// Quick exit if the currency symbol is absent, to avoid unnecessary DOM traversal
 	if (!/zł|zl/i.test(document.body.textContent)) {
 		return;
 	}
@@ -30,8 +30,8 @@
 	const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours
 
 	/**
-     * Fetches the latest PLN to EUR rate from the API, wrapped in a Promise for async/await.
-     * @returns {Promise<number>} The EUR exchange rate.
+     * Fetches the latest PLN to EUR rate, wrapped in a Promise for async/await.
+     * @returns {Promise<number>}
      */
 	const fetchRateFromApi = () => {
 		return new Promise((resolve, reject) => {
@@ -57,8 +57,8 @@
 	};
 
 	/**
-     * Gets the exchange rate, using a cached value if it's available and not expired.
-     * @returns {Promise<number>} The EUR exchange rate.
+     * Gets the exchange rate, using the cached value if available and not expired.
+     * @returns {Promise<number>}
      */
 	const getExchangeRate = async () => {
 		const cachedRate = await GM_getValue('pln_to_eur_rate');
@@ -75,15 +75,14 @@
 		return rate;
 	};
 
-	// Define the observer in a higher scope so it can be controlled within the conversion function.
+	// Defined in outer scope so convertCurrencyOnPage can disconnect/reconnect it
 	let observer;
 
 	/**
      * Traverses the document's text nodes and replaces złoty prices with their Euro equivalent.
      * @param {number} rate - The PLN to EUR conversion rate.
-     */
-	const convertCurrencyOnPage = (rate) => {
-		// Disconnect the observer to prevent it from reacting to its own DOM manipulations.
+     */	const convertCurrencyOnPage = (rate) => {
+		// Disconnect to prevent reacting to our own DOM manipulations
 		if (observer) {
 			observer.disconnect();
 		}
@@ -120,7 +119,6 @@
 			}
 		}
 
-		// Reconnect the observer to watch for future page changes.
 		if (observer) {
 			observer.observe(document.body, { childList: true, subtree: true });
 		}
@@ -129,10 +127,9 @@
 
 	try {
 		const rate = await getExchangeRate();
-		// Run the initial conversion on page load.
 		convertCurrencyOnPage(rate);
 
-		// Set up the observer to handle dynamically loaded content (e.g., infinite scroll).
+		// Re-run on dynamically loaded content (e.g., infinite scroll)
 		observer = new MutationObserver(() => convertCurrencyOnPage(rate));
 		observer.observe(document.body, { childList: true, subtree: true });
 

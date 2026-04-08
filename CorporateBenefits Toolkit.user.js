@@ -280,7 +280,8 @@
 			const currentState = GLOBAL_STATE.sortState;
 			let newState;
 
-			// Cycle: desc -> asc -> off -> desc			if (currentState === 'desc') {
+			// Cycle: desc -> asc -> off -> desc
+			if (currentState === 'desc') {
 				newState = 'asc';
 			} else if (currentState === 'asc') {
 				newState = 'off';

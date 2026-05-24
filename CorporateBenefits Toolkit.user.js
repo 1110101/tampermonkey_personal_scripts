@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         CorporateBenefits Toolkit
 // @namespace    1110101
-// @version      1.1.0
+// @version      1.1.2
 // @description  Sort and filter offers by discount, fix shop buttons to open directly
 // @author       1110101@oczc.de
 // @match        https://*.mitarbeiterangebote.de/overview/*
+// @match        https://*.mitarbeiterangebote.de/search*
 // @match        https://*.mitarbeiterangebote.de/offer/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mitarbeiterangebote.de
 // @grant        GM_addStyle
@@ -13,6 +14,15 @@
 // @downloadURL  https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/CorporateBenefits%20Toolkit.user.js
 // @updateURL    https://raw.githubusercontent.com/1110101/tampermonkey_personal_scripts/main/CorporateBenefits%20Toolkit.user.js
 // ==/UserScript==
+
+/**
+ * README / Features:
+ * 
+ * 1. Ad Blocker: Automatically hides inline advertisement elements.
+ * 2. Sorting by Discount: Parses the discount text (e.g. "> 7% Rabatt") and allows you to sort items by highest or lowest discount across all categories.
+ * 3. Dynamic Filtering: Automatically calculates the distribution of discounts, categorizes them into Low/Medium/High tertiles, and allows you to easily filter them.
+ * 4. Shop Button Fixer: Modifies "To Shop" buttons on offer pages to bypass the annoying interstitial overlay and open directly in a new tab.
+ */
 
 (function () {
 	'use strict';
@@ -27,7 +37,7 @@
 	const CONFIG = {
 		selectors: {
 			category: '.cbg3-category',
-			categoryContent: '.cbg3-category--content',
+			categoryContent: '.cbg3-category--content, .cbg3-search--offers',
 			listItem: '.cbg3-list-item',
 			discountElement: '.cbg3-list-item--discount p',
 			categoryHead: '.cbg3-category--head'
@@ -102,11 +112,10 @@
 	}
 
 	/**
-     * @param {HTMLElement} category
+     * @param {HTMLElement} contentContainer
      * @param {boolean} ascending
      */
-	function sortItemsByDiscount(category, ascending = false) {
-		const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
+	function sortItemsByDiscount(contentContainer, ascending = false) {
 		if (!contentContainer) {
 			return;
 		}
@@ -132,11 +141,10 @@
 	}
 
 	/**
-	 * @param {HTMLElement} category
+	 * @param {HTMLElement} contentContainer
 	 * @param {string} filterType - 'all', 'high', 'medium', 'low'
 	 */
-	function filterItemsByDiscount(category, filterType) {
-		const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
+	function filterItemsByDiscount(contentContainer, filterType) {
 		if (!contentContainer) {
 			return;
 		}
@@ -365,13 +373,8 @@
 	function calculateFilterRanges() {
 		const allDiscounts = [];
 
-		const categories = document.querySelectorAll('.cbg3-content');
-		categories.forEach(category => {
-			const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
-			if (!contentContainer) {
-				return;
-			}
-
+		const contentContainers = document.querySelectorAll(CONFIG.selectors.categoryContent);
+		contentContainers.forEach(contentContainer => {
 			const items = contentContainer.querySelectorAll(CONFIG.selectors.listItem);
 			items.forEach(item => {
 				if (item.classList.contains('cbg3-ad')) {
@@ -412,34 +415,31 @@
 	}
 
 	function applySortToAllCategories() {
-		const categories = document.querySelectorAll('.cbg3-content');
-		categories.forEach(category => {
+		const contentContainers = document.querySelectorAll(CONFIG.selectors.categoryContent);
+		contentContainers.forEach(contentContainer => {
 			if (GLOBAL_STATE.sortState === 'desc') {
-				sortItemsByDiscount(category, false);
+				sortItemsByDiscount(contentContainer, false);
 			} else if (GLOBAL_STATE.sortState === 'asc') {
-				sortItemsByDiscount(category, true);
+				sortItemsByDiscount(contentContainer, true);
 			} else {
 				// Restore original DOM order using stored data-id
-				const contentContainer = category.querySelector(CONFIG.selectors.categoryContent);
-				if (contentContainer) {
-					const items = Array.from(contentContainer.querySelectorAll(CONFIG.selectors.listItem));
-					items.sort((a, b) => {
-						const idA = parseInt(a.dataset.id) || 0;
-						const idB = parseInt(b.dataset.id) || 0;
-						return idA - idB;
-					});
-					items.forEach(item => {
-						contentContainer.appendChild(item);
-					});
-				}
+				const items = Array.from(contentContainer.querySelectorAll(CONFIG.selectors.listItem));
+				items.sort((a, b) => {
+					const idA = parseInt(a.dataset.id) || 0;
+					const idB = parseInt(b.dataset.id) || 0;
+					return idA - idB;
+				});
+				items.forEach(item => {
+					contentContainer.appendChild(item);
+				});
 			}
 		});
 	}
 
 	function applyFilterToAllCategories() {
-		const categories = document.querySelectorAll('.cbg3-content');
-		categories.forEach(category => {
-			filterItemsByDiscount(category, GLOBAL_STATE.filterState);
+		const contentContainers = document.querySelectorAll(CONFIG.selectors.categoryContent);
+		contentContainers.forEach(contentContainer => {
+			filterItemsByDiscount(contentContainer, GLOBAL_STATE.filterState);
 		});
 	}
 
@@ -497,7 +497,7 @@
 	}
 
 	function initializeAllCategories() {
-		const categoryContainers = document.querySelectorAll('.cbg3-category--content');
+		const categoryContainers = document.querySelectorAll(CONFIG.selectors.categoryContent);
 
 		// Recalculate filter ranges if not yet done or if new categories were added
 		const needsRecalculation = !GLOBAL_STATE.filterRanges ||
@@ -521,18 +521,20 @@
 			}
 
 			const categoryHead = contentContainer.previousElementSibling;
-			if (categoryHead && categoryHead.classList.contains('cbg3-category--head')) {
-				const category = contentContainer.closest('.cbg3-content') || contentContainer.parentElement;
-				const controls = createControlButtons();
-				categoryHead.insertAdjacentElement('afterend', controls);
+			const controls = createControlButtons();
 
-				if (GLOBAL_STATE.sortState === 'desc') {
-					sortItemsByDiscount(category, false);
-				} else if (GLOBAL_STATE.sortState === 'asc') {
-					sortItemsByDiscount(category, true);
-				}
-				filterItemsByDiscount(category, GLOBAL_STATE.filterState);
+			if (categoryHead && categoryHead.classList.contains('cbg3-category--head')) {
+				categoryHead.insertAdjacentElement('afterend', controls);
+			} else {
+				contentContainer.insertAdjacentElement('beforebegin', controls);
 			}
+
+			if (GLOBAL_STATE.sortState === 'desc') {
+				sortItemsByDiscount(contentContainer, false);
+			} else if (GLOBAL_STATE.sortState === 'asc') {
+				sortItemsByDiscount(contentContainer, true);
+			}
+			filterItemsByDiscount(contentContainer, GLOBAL_STATE.filterState);
 		});
 	}
 
@@ -545,7 +547,9 @@
 					mutation.addedNodes.forEach((node) => {
 						if (node.nodeType === Node.ELEMENT_NODE) {
 							if (node.classList?.contains('cbg3-category--content') ||
-								node.querySelector?.('.cbg3-category--content')) {
+								node.classList?.contains('cbg3-search--offers') ||
+								node.querySelector?.('.cbg3-category--content') ||
+								node.querySelector?.('.cbg3-search--offers')) {
 								shouldReinitialize = true;
 							}
 						}
@@ -638,7 +642,7 @@
 
 	const currentPath = window.location.pathname;
 
-	if (currentPath.includes('/overview/')) {
+	if (currentPath.includes('/overview/') || currentPath.includes('/search')) {
 		waitForContent();
 	} else if (currentPath.includes('/offer/')) {
 		waitForShopButtons();

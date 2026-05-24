@@ -1,7 +1,7 @@
 # Tampermonkey Userscript Development
 
 ## Metadata Standards
-- Author: `oliwer.christ02@sap.com`
+- Author: `oliwer.christ@googlemail.com`
 - License: MIT
 - Namespace: consistent identifier across all scripts
 - Match patterns: be specific but not overly restrictive
@@ -11,14 +11,14 @@
 
 ## Code Style
 - Tabs for indentation, single quotes, semicolons
-- Max line length: 180 characters
+- Max line length: 140 characters
 - ES2025+ (const/let, arrow functions, template literals, optional chaining)
 - Prefer IIFEs for script isolation
 - camelCase for variables/functions, PascalCase for classes, UPPER_CASE for constants
 - Prefix event handlers with `handle` or `on`
 
 ## Tampermonkey Best Practices
-- Include all needed `@grant` directives — only what's strictly used
+- Include all needed `@grant` directives
 - Use `@run-at document-idle` for most scripts
 - Add `@downloadURL` and `@updateURL` for automatic updates
 - Use `GM_setValue`/`GM_getValue` for preferences, never store sensitive user data
@@ -31,7 +31,7 @@
 - Use event delegation; clean up listeners and dynamically created elements
 
 ## Performance & Error Handling
-- try-catch for risky operations, fail silently for DOM manipulations that may break on page changes
+- try-catch for risky operations, fail silently for DOM manipulations that may break on page changes. Log failures.
 - Debounce frequent events (resize, scroll, input)
 - Clean up event listeners and observers
 

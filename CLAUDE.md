@@ -1,7 +1,7 @@
 # Tampermonkey Userscript Development
 
 ## Metadata Standards
-- Author: `oliwer.christ@googlemail.com`
+- Author: `1110101@oczc.de`
 - License: MIT
 - Namespace: consistent identifier across all scripts
 - Match patterns: be specific but not overly restrictive

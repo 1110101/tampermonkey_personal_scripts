@@ -21,7 +21,7 @@
 
 	/*
 
-    based on https://github.com/Farow/userscripts
+	based on https://github.com/Farow/userscripts
 
 	changelog:
 
@@ -76,7 +76,7 @@
 
 			/* check for comments */
 			if (!document.getElementById('noresults')) {
-			/* add UI */
+				/* add UI */
 				this.ui.create_comment_highlighter(this.config.history[thread]);
 				this.ui.create_config_dialog();
 				GM_addStyle(this.data.config_style);
@@ -97,7 +97,7 @@
 			const timestampSelector = '.live-timestamp';
 
 			for (const comment of comments) {
-			/* skip removed or deleted comments */
+				/* skip removed or deleted comments */
 				if (comment.classList.contains('deleted') || comment.classList.contains('spam')) {
 					continue;
 				}
@@ -284,7 +284,7 @@
 			const display = document.getElementById('hnc_time_display');
 
 			if (!highlightTime || highlightTime >= Date.now() - 1000) {
-			// No highlight time or very recent (within 1 second)
+				// No highlight time or very recent (within 1 second)
 				display.style.display = 'none';
 				return;
 			}

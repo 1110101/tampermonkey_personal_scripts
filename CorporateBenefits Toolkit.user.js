@@ -17,7 +17,7 @@
 
 /**
  * README / Features:
- * 
+ *
  * 1. Ad Blocker: Automatically hides inline advertisement elements.
  * 2. Sorting by Discount: Parses the discount text (e.g. "> 7% Rabatt") and allows you to sort items by highest or lowest discount across all categories.
  * 3. Dynamic Filtering: Automatically calculates the distribution of discounts, categorizes them into Low/Medium/High tertiles, and allows you to easily filter them.

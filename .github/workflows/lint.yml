@@ -19,16 +19,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm install -g npm@10.9.3
-          npm ci
+        run: yarn install
 
       - name: Run ESLint
-        run: npm run lint:check
+        run: yarn run lint:check
 
       - name: Count userscripts
-        run: npm run count
+        run: yarn run count
 

@@ -73,7 +73,7 @@
 	document.head.appendChild(style);
 
 	const getCoords = () => {
-		const hash = window.location.hash;
+		const { hash } = window.location;
 		const m = hash.match(/map=(\d+(?:\.\d+)?)\/(-?\d+\.\d+)\/(-?\d+\.\d+)/);
 		if (!m) {
 			return null;
@@ -91,14 +91,14 @@
 			if (!c) {
 				return;
 			}
-			window.open(\`https://www.google.com/maps/@\${c.lat},\${c.lon},\${c.zoom}z\`, '_blank');
+			window.open(`https://www.google.com/maps/@${c.lat},${c.lon},${c.zoom}z`, '_blank');
 		},
 		openRailway: () => {
 			const c = getCoords();
 			if (!c) {
 				return;
 			}
-			window.open(\`https://www.openrailwaymap.org/?style=standard&lat=\${c.lat}&lon=\${c.lon}&zoom=\${Math.round(c.zoom)}\`, '_blank');
+			window.open(`https://www.openrailwaymap.org/?style=standard&lat=${c.lat}&lon=${c.lon}&zoom=${Math.round(c.zoom)}`, '_blank');
 		},
 		googleEarth: () => {
 			const c = getCoords();
@@ -107,7 +107,7 @@
 			}
 			// Linear scaling for distance (d) to accurately match OSM zoom levels
 			const range = Math.round(150 * Math.pow(2, (19 - c.zoom)));
-			window.open(\`https://earth.google.com/web/@\${c.lat},\${c.lon},\${range}d,35y,0h,0t,0r\`, '_blank');
+			window.open(`https://earth.google.com/web/@${c.lat},${c.lon},${range}d,35y,0h,0t,0r`, '_blank');
 		}
 	};
 
@@ -123,9 +123,9 @@
 	 */
 	function createDirectLink(label, svgIcon, title, type, onClick) {
 		const btn = document.createElement('button');
-		btn.className = \`osm-geo-direct-link \${type}\`;
+		btn.className = `osm-geo-direct-link ${type}`;
 		btn.title = title;
-		btn.innerHTML = \`\${svgIcon}<span>\${label}</span>\`;
+		btn.innerHTML = `${svgIcon}<span>${label}</span>`;
 		btn.onclick = (e) => {
 			e.preventDefault();
 			onClick();
@@ -147,7 +147,7 @@
 		// Create the Button Group wrapper
 		const btnGroup = document.createElement('div');
 		btnGroup.id = 'osm-ext-maps-group';
-		
+
 		// Create the individual buttons
 		const gBtn = createDirectLink('G-Maps', ICONS.maps, 'Ort in Google Maps öffnen', 'gmaps', actions.googleMaps);
 		const rBtn = createDirectLink('Railway', ICONS.railway, 'Ort in OpenRailwayMap öffnen', 'railway', actions.openRailway);

@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         CorporateBenefits Toolkit
 // @namespace    1110101
-// @version      1.1.2
-// @description  Sort and filter offers by discount, fix shop buttons to open directly
+// @version      1.2.0
+// @description  Sort and filter offers by discount, fix shop buttons to open directly, auto-accept login disclaimer
 // @author       1110101@oczc.de
+// @match        https://*.mitarbeiterangebote.de/
 // @match        https://*.mitarbeiterangebote.de/overview/*
 // @match        https://*.mitarbeiterangebote.de/search*
 // @match        https://*.mitarbeiterangebote.de/offer/*
@@ -19,7 +20,7 @@
  * README / Features:
  *
  * 1. Ad Blocker: Automatically hides inline advertisement elements.
- * 2. Sorting by Discount: Parses the discount text (e.g. "> 7% Rabatt") and allows you to sort items by highest or lowest discount across all categories.
+ * 2. Sorting by Discount: Parses the discount text (e.g. "> 7% abatt") and allows you to sort items by highest or lowest discount across all categories.
  * 3. Dynamic Filtering: Automatically calculates the distribution of discounts, categorizes them into Low/Medium/High tertiles, and allows you to easily filter them.
  * 4. Shop Button Fixer: Modifies "To Shop" buttons on offer pages to bypass the annoying interstitial overlay and open directly in a new tab.
  */
@@ -29,7 +30,7 @@
 
 	// Hide ads
 	GM_addStyle(`
-		.cbg3-ad {
+		.cbg3-ad .cbg3-banner* {
 			display: none !important;
 		}
 	`);
@@ -640,7 +641,27 @@
 		}, 500);
 	}
 
+	function dismissDisclaimer() {
+		const tryClick = () => {
+			const submitBtn = document.querySelector('#cbg3-overlay--disclaimer #cbg3-submit');
+			if (submitBtn) {
+				submitBtn.click();
+				return true;
+			}
+			return false;
+		};
+
+		if (tryClick()) { return; }
+
+		const observer = new MutationObserver(() => {
+			if (tryClick()) { observer.disconnect(); }
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
+	}
+
 	const currentPath = window.location.pathname;
+
+	dismissDisclaimer();
 
 	if (currentPath.includes('/overview/') || currentPath.includes('/search')) {
 		waitForContent();

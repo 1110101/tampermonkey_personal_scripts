@@ -7,13 +7,18 @@ Various userscripts for enhancing web browsing experience on external sites.
 
 ## Scripts
 
-### CorporateBenefits Toolkit
-Adds sorting and filtering offers by discount percentage. Analyzes all available discounts and dynamically creates three filter ranges (low, medium, high) based on actual data. Blocks some ads.
+### ImmoScout24 Toolkit
+Cuts through the platform's upsell prompts, hidden metrics, and cluttered layouts. Automatically calculates rent or buy price per square meter (€/m²) and displays it next to the price on listing cards. Adds a close button to instantly ignore and hide search result listings, and integrates a persistent, auto-saving notes textarea directly on cards and detail pages. Overrides the map view to keep price markers visible, automatically clicks "Weiterlesen" to expand descriptions, and cleans detail pages into a two-column grid while hiding ads.
 
-**Websites:** https://*.mitarbeiterangebote.de/overview/*
+**Websites:** https://*.immobilienscout24.de/*
+
+### CorporateBenefits Toolkit
+Bypasses redirection screens and adds deal sorting and filtering features. Injects sorting controls into categories (highest first, lowest first, original) and builds dynamic low/medium/high discount filter options on the fly. Rewrites shop buttons to bypass warning redirects and open partner store links directly, automatically clicks past login disclaimers, and hides inline banner ads.
+
+**Websites:** https://*.mitarbeiterangebote.de/overview/*, https://*.mitarbeiterangebote.de/offer/*
 
 ### MitarbeiterVorteile Toolkit
-Adds sorting and filtering offers by discount percentage. Parses various discount formats including standard percentages, German decimal format (4,5%), cashback offers, and complex promotional text. Organizes offers from highest to lowest discount.
+Adds sorting and filtering offers by discount percentage to the employee benefits portal. Parses complex discount formats like standard percentages, German decimal formats (4,5%), cashback, and text coupons. Replaces navigation-blocking buttons with real links for middle-click/Ctrl-click tab support, generates dynamic filters, and persists your sorting and page location between navigations.
 
 **Websites:** https://*.mitarbeitervorteile.de/offers.action*
 

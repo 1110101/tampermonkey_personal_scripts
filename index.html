@@ -752,6 +752,32 @@
 			</div>
 			<div class="row g-4">
 
+				<!-- ImmoScout24 Toolkit -->
+				<div class="col-lg-6">
+					<div class="script-card">
+						<div class="script-card-body">
+							<div class="script-title">
+								<i class="bi bi-house-door"></i> ImmoScout24 Toolkit
+							</div>
+							<p class="script-description">
+								Cuts through the platform's upsell prompts, hidden metrics, and cluttered layouts to make finding an apartment actually bearable.
+							</p>
+							<ul class="script-features">
+								<li>Calculates rent/buy price per m² and displays it on listing cards</li>
+								<li>Adds ✕ close buttons to instantly ignore and hide listing cards</li>
+								<li>Injects auto-saving personal note textareas onto listings and details</li>
+								<li>Forces map markers to stay open and display price tags</li>
+								<li>Cleans expose pages into a 2-column grid and hides upsell banners</li>
+								<li>Enables wheel scrolling and click-to-expand in image galleries</li>
+							</ul>
+						</div>
+						<div class="script-card-footer">
+							<span class="site-badge">immobilienscout24.de</span>
+							<a class="install-link" href="https://github.com/1110101/tampermonkey_personal_scripts/raw/refs/heads/main/ImmoScout24%20Toolkit.user.js" target="_blank"><i class="bi bi-download"></i> Install</a>
+						</div>
+					</div>
+				</div>
+
 				<!-- CorporateBenefits Toolkit -->
 				<div class="col-lg-6">
 					<div class="script-card">
@@ -760,13 +786,14 @@
 								<i class="bi bi-sort-down"></i> CorporateBenefits Toolkit
 							</div>
 							<p class="script-description">
-								Sort and filter employee benefit offers by discount percentage. Fixes shop buttons to open directly without redirect overlays.
+								Bypasses redirection screens and adds deal sorting and filtering features.
 							</p>
 							<ul class="script-features">
-								<li>Dynamic filter ranges based on actual discount distribution</li>
-								<li>3-state sort toggle (highest/lowest/off)</li>
-								<li>Shop buttons open directly in new tab</li>
-								<li>Works on both overview and offer pages</li>
+								<li>Adds sorting buttons (highest first, lowest first, original) to category lists</li>
+								<li>Scans discounts to build dynamic low/medium/high filter buttons on the fly</li>
+								<li>Rewrites shop buttons to open directly in a new tab, skipping warning redirects</li>
+								<li>Dismisses login disclaimer popups automatically</li>
+								<li>Hides inline banner advertisements</li>
 							</ul>
 						</div>
 						<div class="script-card-footer">
@@ -784,13 +811,14 @@
 								<i class="bi bi-gift"></i> MitarbeiterVorteile Toolkit
 							</div>
 							<p class="script-description">
-								Sort and filter employee benefits portal offers by discount. Parses various discount formats including cashback and promotional text.
+								Adds sorting and filtering offers by discount percentage to the employee benefits portal.
 							</p>
 							<ul class="script-features">
-								<li>Intelligent discount format parsing (%, cashback, text)</li>
-								<li>Automatic sorting from highest to lowest</li>
-								<li>Dynamic filter categories</li>
-								<li>Clean control panel interface</li>
+								<li>Sorts offers from highest to lowest discount percentage</li>
+								<li>Parses complex discount text (ranges, cashback, German decimal formats)</li>
+								<li>Replaces click-intercepted buttons with real links for middle-click / Ctrl-click support</li>
+								<li>Generates dynamic low/medium/high discount filter boundaries</li>
+								<li>Saves sort, filter, and page states between page navigations</li>
 							</ul>
 						</div>
 						<div class="script-card-footer">

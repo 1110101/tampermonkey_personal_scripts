@@ -12,9 +12,10 @@
 ## Code Style
 - Tabs for indentation, single quotes, semicolons
 - Max line length: 140 characters
-- ES2025+ (const/let, arrow functions, template literals, optional chaining)
+- ES2025+ (const/let, arrow functions, template literals, optional chaining, async-await)
 - Prefer IIFEs for script isolation
 - camelCase for variables/functions, PascalCase for classes, UPPER_CASE for constants
+- try to DRY and keep different feature modules separated
 - Prefix event handlers with `handle` or `on`
 
 ## Tampermonkey Best Practices
@@ -26,7 +27,7 @@
 
 ## Dynamic Content & DOM
 - Use MutationObserver for dynamic content, not polling
-- Use modern selectors (`querySelector`, `querySelectorAll`)
+- Use modern selectors es2025+
 - Check element existence before manipulation
 - Use event delegation; clean up listeners and dynamically created elements
 

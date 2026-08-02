@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Złoty to Euro Converter
 // @namespace    1110101
-// @version      4.0
+// @version      4.0.1
 // @description  Scans web pages for Polish Złoty (zł/zl) and displays the equivalent amount in Euro (€) in parentheses.
 // @author       1110101@oczc.de
 // @match        http://*/*
@@ -21,8 +21,8 @@
 	'use strict';
 
 
-	// Quick exit if the currency symbol is absent, to avoid unnecessary DOM traversal
-	if (!/zł|zl/i.test(document.body.textContent)) {
+	// Quick exit if document body or currency symbol is absent, to avoid unnecessary DOM traversal
+	if (!document.body || !/zł|zl/i.test(document.body.textContent || '')) {
 		return;
 	}
 
@@ -92,7 +92,8 @@
 
 		const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
 			acceptNode: (node) => {
-				if (node.parentElement.tagName.match(/^(script|style|textarea)$/i) ||
+				const tag = node.parentElement?.tagName;
+				if ((tag && tag.match(/^(script|style|textarea)$/i)) ||
 					!priceTestRegex.test(node.nodeValue)) {
 					return NodeFilter.FILTER_SKIP;
 				}

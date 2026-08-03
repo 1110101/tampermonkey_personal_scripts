@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Dawarich Toolkit
 // @namespace    1110101
-// @version      2.0
+// @version      2.0.1
 // @description  Adds a date range dropdown to the Dawarich map
 // @author       1110101@oczc.de
 // @match        https://dawarich.*.de/map/v2*
@@ -159,7 +159,12 @@
 			panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
 		});
 
-		document.addEventListener('click', () => { panel.style.display = 'none'; }, { capture: true, passive: true });
+		const onDocClick = (e) => {
+			if (!panel.contains(e.target) && e.target !== trigger) {
+				panel.style.display = 'none';
+			}
+		};
+		document.addEventListener('click', onDocClick, { capture: true, passive: true });
 
 		const dd = document.createElement('div');
 		dd.id = 'dtk-dropdown';

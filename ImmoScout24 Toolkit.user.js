@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ImmoScout24 Toolkit
 // @namespace    1110101
-// @version      1.0
+// @version      1.0.1
 // @description  Adds ignore button, price-per-sqm calculation, and forces prices visible on map view
 // @author       1110101@oczc.de
 // @match        *://*.immobilienscout24.de/*
@@ -479,12 +479,12 @@
 				listing.setAttribute('data-enhanced-initialized', 'true');
 
 				const dds = attrContainer ? attrContainer.querySelectorAll('dd.font-body-medium-bold') : [];
-				if (attrContainer && dds.length >= 2) {
+				if (attrContainer && dds.length >= 2 && !attrContainer.querySelector('.is24-sqm-price')) {
 					const price = parseFloat(dds[0].textContent.replace(/[^0-9,]/g, '').replace(',', '.'));
 					const size = parseFloat(dds[1].textContent.replace(/[^0-9,]/g, '').replace(',', '.'));
 					if (!isNaN(price) && !isNaN(size) && size > 0) {
 						const dd = document.createElement('dd');
-						dd.className = 'display-inline font-body-medium-bold';
+						dd.className = 'display-inline font-body-medium-bold is24-sqm-price';
 						dd.textContent = ` (${(price / size).toFixed(2)} €/m²)`;
 						dd.style.color = '#00aa00';
 						attrContainer.appendChild(dd);

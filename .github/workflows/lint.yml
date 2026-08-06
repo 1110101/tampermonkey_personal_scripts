@@ -21,11 +21,11 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
 
       - name: Run ESLint
-        run: yarn run lint:check
+        run: npm run lint:check
 
       - name: Count userscripts
-        run: yarn run count
+        run: npm run count
 

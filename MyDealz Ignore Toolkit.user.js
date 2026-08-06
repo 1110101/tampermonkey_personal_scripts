@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyDealz Ignore Helper
 // @namespace    1110101
-// @version      4.4
+// @version      4.4.1
 // @description  Ignore deals by keyword or manually, track read deals with visual markers
 // @author       1110101@oczc.de
 // @match        https://www.mydealz.de/*
@@ -19,6 +19,9 @@
 
 /*
  * CHANGELOG
+ *
+ * v4.4.1 (2026-08-06)
+ * - Fixed potential infinite retry loop when navigation bar elements are missing
  *
  * v4.3, v4.4 (2025-10-05)
  * - Added title ignore button with edit popup - extract keywords from article titles
@@ -86,14 +89,20 @@
 		}, 3000);
 	}
 
+	let iResetButtonRetries = 0;
 	function addResetButton() {
+		if (document.getElementById('mydealz-toggle-seen-btn')) { return; }
 		const elMenuBar = document.querySelector('#tour-expired');
 		if (!elMenuBar) {
-			setTimeout(addResetButton, 500);
+			if (iResetButtonRetries < 10) {
+				iResetButtonRetries++;
+				setTimeout(addResetButton, 500);
+			}
 			return;
 		}
 
 		const elToggleSeenButton = document.createElement('button');
+		elToggleSeenButton.id = 'mydealz-toggle-seen-btn';
 		elToggleSeenButton.classList.add('button', 'button--shape-circle', 'button--type-secondary', 'button--mode-default', 'button--square');
 
 		function updateToggleButton() {

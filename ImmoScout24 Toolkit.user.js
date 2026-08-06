@@ -751,18 +751,18 @@
 		}
 
 		const oldLeft = document.getElementById('is24-redesign-left-col');
-		if (oldLeft) oldLeft.remove();
+		if (oldLeft) {oldLeft.remove();}
 		const oldRight = document.getElementById('is24-redesign-right-col');
-		if (oldRight) oldRight.remove();
+		if (oldRight) {oldRight.remove();}
 		const oldGrid = document.getElementById('is24-redesign-columns-grid');
-		if (oldGrid) oldGrid.remove();
+		if (oldGrid) {oldGrid.remove();}
 
 		const wrapSiblings = (headerSelector, cardClass) => {
 			const header = document.querySelector(headerSelector);
-			if (!header) return;
-			if (header.parentElement.classList.contains('is24-wrapped-card')) return;
+			if (!header) {return;}
+			if (header.parentElement.classList.contains('is24-wrapped-card')) {return;}
 			const text = header.nextElementSibling;
-			if (!text) return;
+			if (!text) {return;}
 
 			const wrapper = document.createElement('div');
 			wrapper.className = `is24-wrapped-card ${cardClass}`;
@@ -852,22 +852,22 @@
 		}
 
 		const descCard = document.querySelector('.is24-card-objektbeschreibung');
-		if (descCard) moveToCol(descCard, leftCol);
+		if (descCard) {moveToCol(descCard, leftCol);}
 
 		const lageCard = document.querySelector('.is24-card-lage');
-		if (lageCard) moveToCol(lageCard, leftCol);
+		if (lageCard) {moveToCol(lageCard, leftCol);}
 
 		const sonstigesCard = document.querySelector('.is24-card-sonstiges');
-		if (sonstigesCard) moveToCol(sonstigesCard, leftCol);
+		if (sonstigesCard) {moveToCol(sonstigesCard, leftCol);}
 
 		const mapSection = document.querySelector('.content-map-section');
-		if (mapSection) moveToCol(mapSection, leftCol);
+		if (mapSection) {moveToCol(mapSection, leftCol);}
 
 		const valuation = document.getElementById('exposeValuation');
-		if (valuation) moveToCol(valuation, rightCol);
+		if (valuation) {moveToCol(valuation, rightCol);}
 
 		const docsWidget = document.getElementById('is24-tenant-documents-widget');
-		if (docsWidget) moveToCol(docsWidget, leftCol);
+		if (docsWidget) {moveToCol(docsWidget, leftCol);}
 
 		// Future-proof siblings: Move any unhandled remaining elements to the left column
 		Array.from(contentSection.children).forEach(child => {
@@ -880,8 +880,8 @@
 	};
 
 	const getCoordinates = () => {
-		let lat = window.IS24?.ssr?.frontendModel?.exposeMap?.location?.latitude;
-		let lon = window.IS24?.ssr?.frontendModel?.exposeMap?.location?.longitude;
+		const lat = window.IS24?.ssr?.frontendModel?.exposeMap?.location?.latitude;
+		const lon = window.IS24?.ssr?.frontendModel?.exposeMap?.location?.longitude;
 		if (typeof lat === 'number' && typeof lon === 'number') {
 			return { lat, lon };
 		}
@@ -901,11 +901,11 @@
 
 	const injectMapButtons = () => {
 		const match = window.location.pathname.match(/\/expose\/(\d+)/);
-		if (!match) return;
+		if (!match) {return;}
 		const [, id] = match;
 
 		const coords = getCoordinates();
-		if (!coords) return;
+		if (!coords) {return;}
 
 		const teaserLinks = Array.from(document.querySelectorAll('a.is24-expose-map-teaser-link'));
 		const textLink = teaserLinks.find(el => el.textContent && el.textContent.includes('Auf Karte zeigen'));

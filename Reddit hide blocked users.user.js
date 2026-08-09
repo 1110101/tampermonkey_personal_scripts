@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit hide blocked users
 // @namespace    https://github.com/1110101/tampermonkey_personal_scripts
-// @version      1.0
+// @version      1.0.1
 // @description  Completely hides comments and posts from blocked users on Reddit (old, new, sh)
 // @author       1110101@oczc.de
 // @match        https://*.reddit.com/*
@@ -17,6 +17,7 @@
 	'use strict';
 
 	function hideAll(root = document) {
+		if (!root || !root.querySelectorAll) { return; }
 		const things = root.matches?.('.thing.collapsed-for-reason')
 			? [root]
 			: root.querySelectorAll('.thing.collapsed-for-reason');
@@ -35,6 +36,10 @@
 				comment.style.display = 'none';
 			}
 		}
+	}
+
+	if (!document.body) {
+		return;
 	}
 
 	hideAll();

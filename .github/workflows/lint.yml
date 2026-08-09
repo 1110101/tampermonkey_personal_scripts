@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -13,19 +14,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
 
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
 
       - name: Run ESLint
-        run: yarn run lint:check
+        run: npm run lint:check
 
       - name: Count userscripts
-        run: yarn run count
+        run: npm run count
 

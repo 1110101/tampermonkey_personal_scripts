@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Wikipedia Koordinaten Direktlinks
 // @namespace    1110101
-// @version      1.0
+// @version      1.1
 // @description  Fügt Direktlinks zu Google Maps, Google Earth, OpenRailwayMap und OpenStreetMap bei den Wikipedia-Koordinaten hinzu.
 // @author       1110101@oczc.de
 // @match        *://de.wikipedia.org/wiki/*
@@ -154,7 +154,7 @@
 			// Define map URLs matching Wikipedia and OSM standards
 			const mapsUrl = `https://www.google.com/maps?ll=${lat},${lon}&z=14&t=m&q=${lat},${lon}&hl=de`;
 			const earthUrl = `https://earth.google.com/web/@${lat},${lon},0a,${earthRange}d,1y,0h,60t,0r`;
-			const railwayUrl = `https://www.openrailwaymap.org/?style=standard&lat=${lat}&lon=${lon}&zoom=15`;
+			const railwayUrl = `https://www.openrailwaymap.app/?style=standard&lat=${lat}&lon=${lon}&zoom=15`;
 			const osmUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}&zoom=14`;
 
 			// Create links

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         OpenStreetMap Direktlinks
 // @namespace    1110101
-// @version      6.1
+// @version      6.2
 // @description  Fügt Direktlinks zu Google Maps, Google Earth und OpenRailwayMap in OpenStreetMap hinzu.
 // @author       1110101@oczc.de
 // @match        *://www.openstreetmap.org/*
@@ -98,7 +98,7 @@
 			if (!c) {
 				return;
 			}
-			window.open(`https://www.openrailwaymap.org/?style=standard&lat=${c.lat}&lon=${c.lon}&zoom=${Math.round(c.zoom)}`, '_blank');
+			window.open(`https://www.openrailwaymap.app/?style=standard&lat=${c.lat}&lon=${c.lon}&zoom=${Math.round(c.zoom)}`, '_blank');
 		},
 		googleEarth: () => {
 			const c = getCoords();

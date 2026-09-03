@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         OpenStreetMap Direktlinks
 // @namespace    1110101
-// @version      6.2
+// @version      6.3.0
 // @description  Fügt Direktlinks zu Google Maps, Google Earth und OpenRailwayMap in OpenStreetMap hinzu.
 // @author       1110101@oczc.de
 // @match        *://www.openstreetmap.org/*
@@ -70,98 +70,124 @@
 			margin-left: 8px;
 		}
 	`;
-	document.head.appendChild(style);
+	(document.head || document.documentElement).appendChild(style);
 
 	const getCoords = () => {
-		const { hash } = window.location;
+		const { hash, search } = window.location;
 		const m = hash.match(/map=(\d+(?:\.\d+)?)\/(-?\d+\.\d+)\/(-?\d+\.\d+)/);
-		if (!m) {
-			return null;
+		if (m) {
+			return {
+				zoom: parseFloat(m[1]),
+				lat: m[2],
+				lon: m[3]
+			};
 		}
-		return {
-			zoom: parseFloat(m[1]),
-			lat: m[2],
-			lon: m[3]
-		};
+
+		// Fallback: Check query parameters
+		const params = new URLSearchParams(search);
+		const lat = params.get('lat');
+		const lon = params.get('lon');
+		const zoom = params.get('zoom') || '15';
+		if (lat && lon) {
+			return {
+				zoom: parseFloat(zoom),
+				lat,
+				lon
+			};
+		}
+
+		return null;
 	};
 
-	const actions = {
-		googleMaps: () => {
-			const c = getCoords();
-			if (!c) {
-				return;
-			}
-			window.open(`https://www.google.com/maps/@${c.lat},${c.lon},${c.zoom}z`, '_blank');
-		},
-		openRailway: () => {
-			const c = getCoords();
-			if (!c) {
-				return;
-			}
-			window.open(`https://www.openrailwaymap.app/?style=standard&lat=${c.lat}&lon=${c.lon}&zoom=${Math.round(c.zoom)}`, '_blank');
-		},
-		googleEarth: () => {
-			const c = getCoords();
-			if (!c) {
-				return;
-			}
-			// Linear scaling for distance (d) to accurately match OSM zoom levels
-			const range = Math.round(150 * Math.pow(2, (19 - c.zoom)));
-			window.open(`https://earth.google.com/web/@${c.lat},${c.lon},${range}d,35y,0h,0t,0r`, '_blank');
+	function updateLinks(btnGroup) {
+		const c = getCoords();
+		if (!c) {
+			return;
 		}
-	};
+
+		const gmaps = btnGroup.querySelector('.osm-geo-direct-link.gmaps');
+		if (gmaps) {
+			gmaps.href = `https://www.google.com/maps/@${c.lat},${c.lon},${c.zoom}z`;
+		}
+
+		const railway = btnGroup.querySelector('.osm-geo-direct-link.railway');
+		if (railway) {
+			railway.href = `https://www.openrailwaymap.app/?style=standard&lat=${c.lat}&lon=${c.lon}&zoom=${Math.round(c.zoom)}`;
+		}
+
+		const earth = btnGroup.querySelector('.osm-geo-direct-link.earth');
+		if (earth) {
+			const range = Math.round(150 * Math.pow(2, (19 - c.zoom)));
+			earth.href = `https://earth.google.com/web/@${c.lat},${c.lon},${range}d,35y,0h,0t,0r`;
+		}
+	}
 
 	/**
-	 * Creates a direct link button.
+	 * Creates a direct link anchor element.
 	 *
 	 * @param {string} label Button label
 	 * @param {string} svgIcon Inline SVG icon
 	 * @param {string} title Tooltip text
 	 * @param {string} type CSS class suffix for color styling
-	 * @param {Function} onClick Click handler
-	 * @returns {HTMLButtonElement} The button element
+	 * @returns {HTMLAnchorElement} The anchor element
 	 */
-	function createDirectLink(label, svgIcon, title, type, onClick) {
-		const btn = document.createElement('button');
-		btn.className = `osm-geo-direct-link ${type}`;
-		btn.title = title;
-		btn.innerHTML = `${svgIcon}<span>${label}</span>`;
-		btn.onclick = (e) => {
-			e.preventDefault();
-			onClick();
-		};
-		return btn;
+	function createDirectLink(label, svgIcon, title, type) {
+		const a = document.createElement('a');
+		a.className = `osm-geo-direct-link ${type}`;
+		a.title = title;
+		a.target = '_blank';
+		a.rel = 'noopener noreferrer';
+		a.href = '#';
+		a.innerHTML = `${svgIcon}<span>${label}</span>`;
+		return a;
 	}
 
+	let observer = null;
+
 	function init() {
-		// Check for the wrapper ID to prevent duplicate injections
 		if (document.getElementById('osm-ext-maps-group')) {
-			return;
+			if (observer) {
+				observer.disconnect();
+			}
+			return true;
 		}
 
 		const ref = document.querySelector('button[data-bs-target="#select_language_dialog"]');
 		if (!ref) {
-			return;
+			return false;
 		}
 
-		// Create the Button Group wrapper
 		const btnGroup = document.createElement('div');
 		btnGroup.id = 'osm-ext-maps-group';
 
-		// Create the individual buttons
-		const gBtn = createDirectLink('G-Maps', ICONS.maps, 'Ort in Google Maps öffnen', 'gmaps', actions.googleMaps);
-		const rBtn = createDirectLink('Railway', ICONS.railway, 'Ort in OpenRailwayMap öffnen', 'railway', actions.openRailway);
-		const eBtn = createDirectLink('Earth', ICONS.earth, 'Ort in Google Earth öffnen', 'earth', actions.googleEarth);
+		const gBtn = createDirectLink('G-Maps', ICONS.maps, 'Ort in Google Maps öffnen', 'gmaps');
+		const rBtn = createDirectLink('Railway', ICONS.railway, 'Ort in OpenRailwayMap öffnen', 'railway');
+		const eBtn = createDirectLink('Earth', ICONS.earth, 'Ort in Google Earth öffnen', 'earth');
 
-		// Append buttons into the group
 		btnGroup.appendChild(gBtn);
 		btnGroup.appendChild(rBtn);
 		btnGroup.appendChild(eBtn);
 
-		// Insert the entire group after the language button
+		updateLinks(btnGroup);
+
+		// Update link URLs on user interaction and map movements
+		btnGroup.addEventListener('mouseenter', () => updateLinks(btnGroup));
+		window.addEventListener('hashchange', () => updateLinks(btnGroup));
+
 		ref.after(btnGroup);
+
+		if (observer) {
+			observer.disconnect();
+		}
+		return true;
 	}
 
-	new MutationObserver(init).observe(document.body, { childList: true, subtree: true });
-	init();
+	if (!init()) {
+		observer = new MutationObserver(() => {
+			if (init()) {
+				observer.disconnect();
+			}
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
+	}
 })();

@@ -30,7 +30,7 @@
 
 	// Hide ads
 	GM_addStyle(`
-		.cbg3-ad .cbg3-banner* {
+		.cbg3-ad, [class*="cbg3-banner"] {
 			display: none !important;
 		}
 	`);
@@ -77,22 +77,22 @@
 
 		const lessThanMatch = text.match(/^<\s*(\d+)%?$/);
 		if (lessThanMatch) {
-			return parseInt(lessThanMatch[1]);
+			return parseInt(lessThanMatch[1], 10);
 		}
 
 		const greaterThanMatch = text.match(/^>\s*(\d+)%?$/);
 		if (greaterThanMatch) {
-			return parseInt(greaterThanMatch[1]);
+			return parseInt(greaterThanMatch[1], 10);
 		}
 
 		const exactMatch = text.match(/^(\d+)%?$/);
 		if (exactMatch) {
-			return parseInt(exactMatch[1]);
+			return parseInt(exactMatch[1], 10);
 		}
 
 		const rangeMatch = text.match(/(\d+)%?/);
 		if (rangeMatch) {
-			return parseInt(rangeMatch[1]);
+			return parseInt(rangeMatch[1], 10);
 		}
 
 		return 0;
@@ -166,7 +166,13 @@
 				show = true;
 			} else if (ranges && filterType in ranges) {
 				const [min, max] = ranges[filterType];
-				show = discountValue >= min && discountValue <= max;
+				if (filterType === 'low') {
+					show = discountValue >= min && discountValue <= max;
+				} else if (filterType === 'medium') {
+					show = discountValue > ranges.low[1] && discountValue <= max;
+				} else if (filterType === 'high') {
+					show = discountValue > ranges.medium[1] && discountValue <= max;
+				}
 			}
 
 			item.style.display = show ? '' : 'none';
@@ -423,11 +429,11 @@
 			} else if (GLOBAL_STATE.sortState === 'asc') {
 				sortItemsByDiscount(contentContainer, true);
 			} else {
-				// Restore original DOM order using stored data-id
+				// Restore original DOM order using stored data-original-order
 				const items = Array.from(contentContainer.querySelectorAll(CONFIG.selectors.listItem));
 				items.sort((a, b) => {
-					const idA = parseInt(a.dataset.id) || 0;
-					const idB = parseInt(b.dataset.id) || 0;
+					const idA = parseInt(a.dataset.originalOrder, 10) || 0;
+					const idB = parseInt(b.dataset.originalOrder, 10) || 0;
 					return idA - idB;
 				});
 				items.forEach(item => {
@@ -517,6 +523,12 @@
 				return;
 			}
 
+			items.forEach((item, index) => {
+				if (!item.dataset.originalOrder) {
+					item.dataset.originalOrder = index;
+				}
+			});
+
 			if (contentContainer.previousElementSibling?.classList?.contains(CONFIG.classes.controlsContainer)) {
 				return;
 			}
@@ -600,7 +612,9 @@
 			link.target = '_blank';
 			link.rel = 'noopener noreferrer';
 			link.className = button.className;
-			link.innerHTML = button.innerHTML;
+			while (button.firstChild) {
+				link.appendChild(button.firstChild);
+			}
 
 			button.replaceWith(link);
 		});

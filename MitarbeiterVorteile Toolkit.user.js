@@ -151,8 +151,8 @@
 		}
 
 		const text = activePage.textContent.trim();
-		const pageNumber = parseInt(text);
-		return isNaN(pageNumber) ? 0 : pageNumber - 1;
+		const pageNumber = parseInt(text, 10);
+		return Number.isNaN(pageNumber) ? 0 : pageNumber - 1;
 	}
 
 	/**
@@ -295,8 +295,8 @@
 		if (!offerList) {return;}
 
 		offerCards.sort((a, b) => {
-			const indexA = parseInt(a.dataset.originalIndex) || 0;
-			const indexB = parseInt(b.dataset.originalIndex) || 0;
+			const indexA = parseInt(a.dataset.originalIndex, 10) || 0;
+			const indexB = parseInt(b.dataset.originalIndex, 10) || 0;
 			return indexA - indexB;
 		});
 
@@ -320,7 +320,13 @@
 				show = true;
 			} else if (ranges && filterType in ranges) {
 				const [min, max] = ranges[filterType];
-				show = discountValue >= min && discountValue <= max;
+				if (filterType === 'low') {
+					show = discountValue >= min && discountValue <= max;
+				} else if (filterType === 'medium') {
+					show = discountValue > ranges.low[1] && discountValue <= max;
+				} else if (filterType === 'high') {
+					show = discountValue > ranges.medium[1] && discountValue <= max;
+				}
 			}
 
 			card.style.display = show ? '' : 'none';
@@ -768,12 +774,16 @@
 
 	function waitForContent() {
 		let observer = null;
+		let pauseTimeout = null;
 
 		// Temporarily disconnects the observer during DOM reordering to prevent feedback loops
 		GLOBAL_STATE.pauseObserver = () => {
 			if (observer) {
 				observer.disconnect();
-				setTimeout(() => {
+				if (pauseTimeout) {
+					clearTimeout(pauseTimeout);
+				}
+				pauseTimeout = setTimeout(() => {
 					if (observer) {
 						observer.observe(document.body, {
 							childList: true,

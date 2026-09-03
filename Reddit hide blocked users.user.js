@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Reddit hide blocked users
-// @namespace    https://github.com/1110101/tampermonkey_personal_scripts
-// @version      1.0.1
+// @namespace    1110101
+// @version      1.1.0
 // @description  Completely hides comments and posts from blocked users on Reddit (old, new, sh)
 // @author       1110101@oczc.de
 // @match        https://*.reddit.com/*
@@ -16,24 +16,45 @@
 (function () {
 	'use strict';
 
+	// Inject CSS for instant hiding where supported to avoid content flashing
+	const style = document.createElement('style');
+	style.textContent = `
+		shreddit-post[is-blocked],
+		shreddit-comment[is-blocked] {
+			display: none !important;
+		}
+	`;
+	(document.head || document.documentElement).appendChild(style);
+
 	function hideAll(root = document) {
-		if (!root || !root.querySelectorAll) { return; }
-		const things = root.matches?.('.thing.collapsed-for-reason')
-			? [root]
-			: root.querySelectorAll('.thing.collapsed-for-reason');
+		if (!root || !root.querySelectorAll) {
+			return;
+		}
+
+		const things = (root.matches?.('.thing.collapsed-for-reason') ? [root] : [])
+			.concat(Array.from(root.querySelectorAll('.thing.collapsed-for-reason')));
 		for (const thing of things) {
 			const reason = thing.querySelector('.collapsed-reason');
 			if (reason?.textContent.trim().toLowerCase() === 'blocked user') {
 				thing.style.display = 'none';
 			}
 		}
-		const comments = root.matches?.('shreddit-comment')
-			? [root]
-			: root.querySelectorAll('shreddit-comment');
+
+		const comments = (root.matches?.('shreddit-comment') ? [root] : [])
+			.concat(Array.from(root.querySelectorAll('shreddit-comment')));
 		for (const comment of comments) {
 			const blockedLabel = comment.querySelector('svg[icon-name="block"] + span');
-			if (blockedLabel?.textContent.trim().toLowerCase() === 'blocked user') {
+			if (comment.hasAttribute('is-blocked') || blockedLabel?.textContent.trim().toLowerCase() === 'blocked user') {
 				comment.style.display = 'none';
+			}
+		}
+
+		const posts = (root.matches?.('shreddit-post') ? [root] : [])
+			.concat(Array.from(root.querySelectorAll('shreddit-post')));
+		for (const post of posts) {
+			const blockedLabel = post.querySelector('svg[icon-name="block"] + span');
+			if (post.hasAttribute('is-blocked') || blockedLabel?.textContent.trim().toLowerCase() === 'blocked user') {
+				post.style.display = 'none';
 			}
 		}
 	}

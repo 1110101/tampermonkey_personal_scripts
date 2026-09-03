@@ -38,7 +38,7 @@
 		const input = document.getElementById('start_at');
 		if (input?.value) {
 			const d = new Date(input.value);
-			if (!isNaN(d)) { return d; }
+			if (!Number.isNaN(d.getTime())) { return d; }
 		}
 		return new Date();
 	};
@@ -159,13 +159,6 @@
 			panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
 		});
 
-		const onDocClick = (e) => {
-			if (!panel.contains(e.target) && e.target !== trigger) {
-				panel.style.display = 'none';
-			}
-		};
-		document.addEventListener('click', onDocClick, { capture: true, passive: true });
-
 		const dd = document.createElement('div');
 		dd.id = 'dtk-dropdown';
 		dd.style.position = 'relative';
@@ -174,6 +167,19 @@
 
 		flexRow.appendChild(dd);
 	};
+
+	// Register outside injectDropdown so it is attached only once
+	document.addEventListener('click', (e) => {
+		const dd = document.getElementById('dtk-dropdown');
+		if (!dd) {
+			return;
+		}
+		const panel = dd.querySelector('.shadow-xl');
+		const trigger = dd.querySelector('button');
+		if (panel && trigger && !panel.contains(e.target) && e.target !== trigger) {
+			panel.style.display = 'none';
+		}
+	}, { capture: true, passive: true });
 
 	const injectButtons = () => {
 		const form = document.querySelector('[data-controller="map-controls"] form');
@@ -187,6 +193,7 @@
 	};
 
 	document.addEventListener('turbo:render', injectButtons);
+	document.addEventListener('turbo:load', injectButtons);
 
 	if (document.querySelector('[data-controller="map-controls"] form')) {
 		injectButtons();

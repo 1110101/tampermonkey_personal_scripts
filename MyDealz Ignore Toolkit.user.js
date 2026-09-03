@@ -230,7 +230,7 @@
 		arrEntries.forEach(objEntry => {
 			if (objEntry.isIntersecting) {
 				setTimeout(() => {
-					if (objEntry.isIntersecting && isElementFullyVisible(objEntry.target)) {
+					if (isElementFullyVisible(objEntry.target)) {
 						const strArticleId = objEntry.target.id;
 						if (!strArticleId) {
 							return;
@@ -447,6 +447,13 @@
 		elTextarea.select();
 	}
 
+	function escapeHTML(str) {
+		if (!str) {
+			return '';
+		}
+		return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+	}
+
 	function openKeywordManagementModal() {
 		const elModal = document.createElement('div');
 		elModal.id = 'gm-keyword-modal';
@@ -538,7 +545,7 @@
 				elItem.className = 'gm-keyword-item';
 				elItem.innerHTML = `
 					<div class="gm-keyword-content">
-						<span class="gm-keyword-text">${strKeyword}</span>
+						<span class="gm-keyword-text">${escapeHTML(strKeyword)}</span>
 						${bExactMatch ? '<span class="gm-keyword-badge">🎯 Ganzes Wort</span>' : '<span class="gm-keyword-badge gm-keyword-badge--partial">📝 Teilwort</span>'}
 					</div>
 					<div class="gm-keyword-actions">
@@ -742,7 +749,7 @@
 		.gm-empty-state { text-align: center; color: #999; padding: 40px 20px; font-style: italic; }
 	`;
 	if (arrIgnoreList.length > 0) {
-		strIgnoreString += ` article#${arrIgnoreList.join(', article#')} { display:none !important;}`;
+		strIgnoreString += ` article[id="${arrIgnoreList.join('"], article[id="')}"] { display:none !important; }`;
 	}
 	GM_addStyle(strIgnoreString);
 

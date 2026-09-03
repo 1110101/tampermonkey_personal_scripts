@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Reddit highlight new comments
-// @namespace    https://github.com/Farow/userscripts
-// @version      3.0.1
-// @description  Highlights new comments since your last visit
+// @namespace    1110101
+// @version      3.0.2
+// @description  Highlights new comments since your last visit (old.reddit.com / classic layout)
 // @author       Farow, 1110101, Claude, Gemini
 // @match        https://*.reddit.com/r/*/comments/*
-// @require      https://raw.githubusercontent.com/bgrins/TinyColor/master/tinycolor.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.6.0/tinycolor.min.js
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=reddit.com
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -253,7 +253,7 @@
 			}
 
 			if (visits.length > 1) {
-				select.selectedIndex = 2; // index 2 is the first actual visit
+				select.selectedIndex = 3; // index 3 corresponds to visits[1] (the previous visit)
 				// Trigger highlighting for the default selection
 				HNC.highlight(visits[1]);
 			}
@@ -801,7 +801,7 @@
 		let timeInput = time;
 		switch (typeof timeInput) {
 			case 'string': timeInput = +new Date(timeInput); break;
-			case 'object': if (timeInput.constructor === Date) {
+			case 'object': if (timeInput instanceof Date) {
 				timeInput = timeInput.getTime();
 			} break;
 			case 'number':

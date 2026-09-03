@@ -482,7 +482,7 @@
 				if (attrContainer && dds.length >= 2 && !attrContainer.querySelector('.is24-sqm-price')) {
 					const price = parseFloat(dds[0].textContent.replace(/[^0-9,]/g, '').replace(',', '.'));
 					const size = parseFloat(dds[1].textContent.replace(/[^0-9,]/g, '').replace(',', '.'));
-					if (!isNaN(price) && !isNaN(size) && size > 0) {
+					if (!Number.isNaN(price) && !Number.isNaN(size) && size > 0) {
 						const dd = document.createElement('dd');
 						dd.className = 'display-inline font-body-medium-bold is24-sqm-price';
 						dd.textContent = ` (${(price / size).toFixed(2)} €/m²)`;
@@ -602,7 +602,7 @@
 
 	document.addEventListener('wheel', (e) => {
 		const gallery = document.querySelector('[data-testid="gallery-layer"]');
-		if (!gallery) {
+		if (!gallery || !gallery.contains(e.target)) {
 			return;
 		}
 
@@ -880,18 +880,19 @@
 	};
 
 	const getCoordinates = () => {
-		const lat = window.IS24?.ssr?.frontendModel?.exposeMap?.location?.latitude;
-		const lon = window.IS24?.ssr?.frontendModel?.exposeMap?.location?.longitude;
+		const is24 = typeof unsafeWindow !== 'undefined' ? unsafeWindow.IS24 : window.IS24;
+		const lat = is24?.ssr?.frontendModel?.exposeMap?.location?.latitude;
+		const lon = is24?.ssr?.frontendModel?.exposeMap?.location?.longitude;
 		if (typeof lat === 'number' && typeof lon === 'number') {
 			return { lat, lon };
 		}
-		const url = window.IS24?.expose?.quickCheckConfig?.quickCheckServiceUrl;
+		const url = is24?.expose?.quickCheckConfig?.quickCheckServiceUrl;
 		if (url) {
 			const match = url.match(/\/latitude\/([0-9.]+)\/longitude\/([0-9.]+)/);
 			if (match) {
 				const parsedLat = parseFloat(match[1]);
 				const parsedLon = parseFloat(match[2]);
-				if (!isNaN(parsedLat) && !isNaN(parsedLon)) {
+				if (!Number.isNaN(parsedLat) && !Number.isNaN(parsedLon)) {
 					return { lat: parsedLat, lon: parsedLon };
 				}
 			}
@@ -946,8 +947,8 @@
 		}
 	};
 
-	const observer = new MutationObserver(() => {
-		injectStyles();
+	let mutationDebounceTimer = null;
+	const runDOMUpdates = () => {
 		initializeUI();
 		initializeExposeUI();
 		applyExposeRedesign();
@@ -958,18 +959,19 @@
 		if (!document.querySelector('[data-testid="gallery-layer"]')) {
 			document.body.classList.remove('is24-enlarged-gallery');
 		}
+	};
+
+	const observer = new MutationObserver(() => {
+		if (mutationDebounceTimer) {
+			cancelAnimationFrame(mutationDebounceTimer);
+		}
+		mutationDebounceTimer = requestAnimationFrame(runDOMUpdates);
 	});
 
 	const start = () => {
 		cleanStaleNotes();
 		observer.observe(document.body, { childList: true, subtree: true });
-		initializeUI();
-		initializeExposeUI();
-		applyExposeRedesign();
-		autoExpandDescriptions();
-		forceShowPrices();
-		injectMapButton();
-		injectMapButtons();
+		runDOMUpdates();
 	};
 
 	if (document.body) {

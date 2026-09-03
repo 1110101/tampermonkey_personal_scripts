@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Wikipedia Koordinaten Direktlinks
 // @namespace    1110101
-// @version      1.1
+// @version      1.2.0
 // @description  Fügt Direktlinks zu Google Maps, Google Earth, OpenRailwayMap und OpenStreetMap bei den Wikipedia-Koordinaten hinzu.
 // @author       1110101@oczc.de
-// @match        *://de.wikipedia.org/wiki/*
-// @match        *://de.wikipedia.org/w/index.php*
+// @match        *://*.wikipedia.org/wiki/*
+// @match        *://*.wikipedia.org/w/index.php*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=wikipedia.org
 // @grant        none
 // @run-at       document-idle
@@ -48,7 +48,7 @@
 			transform: scale(1.1);
 		}
 	`;
-	document.head.appendChild(style);
+	(document.head || document.documentElement).appendChild(style);
 
 	/**
 	 * Parses the GeoHack query parameters to extract latitude and longitude.

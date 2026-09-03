@@ -83,6 +83,7 @@
 			return new Promise((resolve, reject) => {
 				request.onsuccess = () => resolve(request.result);
 				request.onerror = () => reject(request.error);
+				transaction.onerror = () => reject(transaction.error);
 			});
 		},
 		async deleteByGroup(groupName) {
@@ -234,11 +235,17 @@
 			}
 		},
 		Image: {
+			activeBlobUrls: [],
 			async render() {
 				const container = document.getElementById('image-manager-container');
 				if (!container) {
 					return;
 				}
+
+				// Revoke previously created blob URLs to prevent memory leaks
+				this.activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+				this.activeBlobUrls = [];
+
 				const images = await Storage.execDB('getAll');
 				const groups = images.reduce((acc, image) => {
 					const group = image.group || 'Unsortierte Bilder';
@@ -260,11 +267,15 @@
                                 <span class="tm-button delete" data-action="delete-group" data-group-name="${safeGroupName}">Gruppe löschen</span>
                             </div>
                             <div class="tm-image-thumbnails">
-                                ${groups[groupName].map(img => `
+                                ${groups[groupName].map(img => {
+		const blobUrl = URL.createObjectURL(img.blob);
+		this.activeBlobUrls.push(blobUrl);
+		return `
                                     <div class="img-thumbnail-wrapper">
-                                        <img src="${URL.createObjectURL(img.blob)}" class="img-thumbnail" data-action="add-image" data-img-id="${img.id}">
+                                        <img src="${blobUrl}" class="img-thumbnail" data-action="add-image" data-img-id="${img.id}">
                                         <span class="img-thumbnail-delete" data-action="delete-image" data-img-id="${img.id}">&times;</span>
-                                    </div>`).join('')}
+                                    </div>`;
+	}).join('')}
                             </div>
                         </div>`;
 					}
@@ -343,13 +354,16 @@
 				}
 				const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 				const waitFor = (selector, scope = document) => new Promise((resolve, reject) => {
-					const i = setInterval(() => {
-						const el = scope.querySelector(selector); if (el) {
-							clearInterval(i); resolve(el);
+					const timer = setInterval(() => {
+						const el = scope.querySelector(selector);
+						if (el) {
+							clearInterval(timer);
+							resolve(el);
 						}
 					}, 100);
 					setTimeout(() => {
-						clearInterval(i); reject();
+						clearInterval(timer);
+						reject(new Error(`Timeout waiting for ${selector}`));
 					}, 5000);
 				});
 				for (let i = 0; i < editButtons.length; i++) {
@@ -427,15 +441,16 @@
 		App.Image.render();
 	}
 
-	// Survives "Turbo-Reloads" and re-initializes the UI if needed
-	setInterval(main, 500);
+	main();
 
-	// Handles image dialog injection
-	setInterval(() => {
+	const observer = new MutationObserver(() => {
+		main();
 		const dialog = Array.from(document.querySelectorAll('dialog')).find(d => d.querySelector('#image-to-edit') && d.hasAttribute('open'));
 		if (dialog && !dialog.querySelector('.tm-dialog-button')) {
 			App.Image.injectSaveButton(dialog.querySelector('#image-to-edit'));
 		}
-	}, 500);
+	});
+
+	observer.observe(document.body, { childList: true, subtree: true });
 
 })();
